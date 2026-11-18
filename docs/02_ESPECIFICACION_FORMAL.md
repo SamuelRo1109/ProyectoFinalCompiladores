@@ -49,13 +49,13 @@ AlphabetType ::= AlphabetType(device: →Device)
 | 1 | `HomeSystem` | `INamedConcept` | **sí** | `sistema` | — | `roles: Role[0..n]`, `devices: Device[1..n]`, `policies: Policy[0..n]`, `scenarios: Scenario[0..n]` | — |
 | 2 | `Role` | `INamedConcept` | no | `rol` | — | — | `parent: Role[0..1]` |
 | 3 | `Device` | `INamedConcept` | no | `dispositivo` | — | `events: Event[1..n]`, `states: State[1..n]`, `transitions: Transition[0..n]` | — |
-| 4 | `EventKind` | enumeración | — | — | `COMMAND`, `SENSOR`, `TIMER` | — | — |
+| 4 | `EventKind` | enumeración | — | — | `COMMAND` (por defecto), `SENSOR`, `TIMER` | — | — |
 | 5 | `Event` | `INamedConcept`, `IDeviceElement` | no | `evento` | `kind: EventKind` | — | `requiredRole: Role[0..1]` |
 | 6 | `IDeviceElement` | **interfaz de concepto** | — | — | — | — | — (behavior: `getDevice()`) |
 | 7 | `State` | `INamedConcept`, `IDeviceElement` | no | `estado` | `initial: boolean`, `accepting: boolean` | — | — |
 | 8 | `AlarmState` | **extends `State`** | no | `alarma` | — | — | — |
 | 9 | `Transition` | `IDeviceElement` | no | `transicion` | — | — | `source: State[1]`, `event: Event[1]`, `target: State[1]` |
-| 10 | `PolicyMode` | enumeración | — | — | `REQUIRED`, `FORBIDDEN` | — | — |
+| 10 | `PolicyMode` | enumeración | — | — | `REQUIRED` (por defecto), `FORBIDDEN` | — | — |
 | 11 | `Policy` | `INamedConcept` | no | `politica` | `mode: PolicyMode` | `expr: RegexExpr[1]` | `device: Device[1]` |
 | 12 | `RegexExpr` | **abstracto** | no | — | — | — | — |
 | 13 | `SymbolExpr` | extends `RegexExpr` | no | (nombre del evento) | — | — | `event: Event[1]` |
@@ -71,7 +71,7 @@ AlphabetType ::= AlphabetType(device: →Device)
 | 23 | `ParenExpr` | extends `UnaryRegexExpr` | no | `(` | — | — | — |
 | 24 | `Scenario` | `INamedConcept` | no | `escenario` | — | `actor: ActorRef[1]`, `steps: ScenarioStep[0..n]` | `device: Device[1]` |
 | 25 | `ActorRef` | — | no | `actor` | — | — | `role: Role[1]` |
-| 26 | `ScenarioStep` | — | no | `paso` | — | — | `event: Event[1]` |
+| 26 | `ScenarioStep` | — | no | (nombre del evento; sin alias: referencia inteligente) | — | — | `event: Event[1]` |
 | 27 | `RoleType` | concepto de tipo | no | — | — | — | `role: Role[1]` |
 | 28 | `AlphabetType` | concepto de tipo | no | — | — | — | `device: Device[1]` |
 
