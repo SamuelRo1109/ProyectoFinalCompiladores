@@ -1,0 +1,31 @@
+{
+  "env": {
+    "ENABLE_TOOL_SEARCH": "true"
+  },
+  "enabledMcpjsonServers": ["mps"],
+  "permissions": {
+    "allow": [
+      "mcp__mps",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git checkout:*)",
+      "Bash(javac:*)",
+      "Bash(java:*)"
+    ],
+    "deny": [
+      "Edit(**/*.mps)",
+      "Write(**/*.mps)",
+      "Edit(**/*.mpl)",
+      "Write(**/*.mpl)",
+      "Edit(**/*.msd)",
+      "Write(**/*.msd)",
+      "Edit(**/*.devkit)",
+      "Write(**/*.devkit)",
+      "Bash(git push --force:*)",
+      "Bash(git push -f:*)"
+    ]
+  }
+}

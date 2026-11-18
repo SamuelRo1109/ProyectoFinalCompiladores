@@ -1,0 +1,35 @@
+# ---- JetBrains MPS ----
+# Configuración local del IDE (no compartir)
+workspace.xml
+**/.mps/workspace.xml
+**/.mps/shelf/
+build.properties
+
+# Código Java generado y clases compiladas
+source_gen/
+source_gen.caches/
+classes_gen/
+
+# Código de pruebas generado y resultados
+test_gen/
+test_gen.caches/
+TEST-*.xml
+junit*.properties
+junitvmwatcher*.properties
+
+# Salidas de build
+out/
+build/artifacts/
+
+# ---- Prototipo Java ----
+prototipo-razonador/**/*.class
+
+# ---- Claude Code (configuración personal) ----
+.claude/settings.local.json
+.mcp.local.json
+
+# ---- Sistema operativo / editores ----
+.DS_Store
+Thumbs.db
+*.swp
+*~
