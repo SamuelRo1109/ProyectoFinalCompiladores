@@ -16,7 +16,7 @@ Proyecto de la asignatura de Teoría de la Computación.
 
 ## Estructura
 ```
-domus/                      Proyecto MPS (domus.lang, domus.reasoner, domus.sandbox, domus.tests)
+domus/                      Proyecto MPS (domus.lang, domus.reasoner, domus.lang.sandbox, domus.tests)
 prototipo-razonador/        Prototipo Java plano de los algoritmos (Sesión 2)
 docs/01_ANALISIS_Y_PLAN.md  Análisis, viabilidad, GitFlow y plan de sesiones
 docs/02_ESPECIFICACION_FORMAL.md  Gramática abstracta, tipos y semántica del razonador

@@ -9,7 +9,7 @@
 |---|---|---|
 | `domus.lang` | Language | Structure, Editor, Constraints, Behavior, Typesystem, Generator, Intentions |
 | `domus.reasoner` | Solution (BaseLanguage) | Algoritmos del razonador sobre autómatas (independientes de MPS) |
-| `domus.sandbox` | Solution | 3 modelos válidos + 3 inválidos (+ caso demo) |
+| `domus.lang.sandbox` | Solution | 3 modelos válidos + 3 inválidos (+ caso demo) |
 | `domus.tests` | Solution con modelo `@tests` | Pruebas `jetbrains.mps.lang.test` y `jetbrains.mps.baseLanguage.unitTest` |
 
 Proyecto MPS en la subcarpeta `domus/` del repositorio.
@@ -246,7 +246,7 @@ Todas las propiedades anteriores son **decidibles** porque los modelos son autó
 
 ## 6. Modelos de la Sandbox (Hito 2)
 
-Cada uno es un **modelo MPS separado** en `domus.sandbox` (literal a la guía).
+Cada uno es un **modelo MPS separado** en `domus.lang.sandbox` (literal a la guía).
 
 | Modelo | Tipo | Qué demuestra |
 |---|---|---|

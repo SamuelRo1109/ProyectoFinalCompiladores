@@ -123,7 +123,7 @@ agregar una fila a la tabla δ y la intention "Crear vista de verificación". Ej
 
 **Prompt:**
 ```
-Crea el modelo domus.sandbox demo.caso_en_vivo con un HomeSystem pequeño (2 dispositivos)
+Crea el modelo domus.lang.sandbox demo.caso_en_vivo con un HomeSystem pequeño (2 dispositivos)
 y escribe docs/GUION_DEMO.md: guion de 5 minutos para mostrar en vivo, paso a paso,
 (1) escribir un dispositivo con la tabla δ, (2) un error de alcance y uno de tipos atrapados,
 (3) el razonador detectando un deadlock y una política violada con contraejemplo,

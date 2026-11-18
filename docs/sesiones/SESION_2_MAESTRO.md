@@ -29,7 +29,7 @@
    - [ ] `Build → Rebuild Project` sin errores (salvo los modelos `invalidos.*`, que tienen errores a propósito).
    - [ ] `validos.v1..v3` sin errores; `invalidos.*` muestran su error.
    - [ ] La estructura coincide con `02_ESPECIFICACION_FORMAL.md`.
-   - **Prompt útil:** *"Revisa el estado del proyecto MPS: valida todos los modelos de domus.sandbox y del lenguaje domus.lang y dame un resumen de problemas por modelo."*
+   - **Prompt útil:** *"Revisa el estado del proyecto MPS: valida todos los modelos de domus.lang.sandbox y del lenguaje domus.lang y dame un resumen de problemas por modelo."*
 8. Haz merge del PR en GitHub. Luego:
 ```bash
 git checkout develop && git pull
