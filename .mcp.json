@@ -2,7 +2,7 @@
   "mcpServers": {
     "mps": {
       "type": "http",
-      "url": "http://localhost:64342/stream"
+      "url": "http://127.0.0.1:64342/stream"
     }
   }
 }

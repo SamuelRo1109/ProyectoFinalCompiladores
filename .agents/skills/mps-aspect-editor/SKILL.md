@@ -1,0 +1,58 @@
+---
+name: mps-aspect-editor
+description: Use when creating or changing MPS editor definitions — the overall workflow from scaffolding a `ConceptEditorDeclaration` through componentizing reusable `EditorComponentDeclaration`s, refining cell models and cell layouts, applying style sheets and indent-layout style items, wiring smart references, leveraging inheritance via super-concepts and interfaces, inspecting (`print_node_json`, `show_node_representation`) and validating (`check_root_node_problems`). Covers `jetbrains.mps.lang.editor` cell models (`CellModel_RefNode`/`CellModel_RefNodeList`/`CellModel_RefCell`/`CellModel_Property`/`CellModel_Constant`), layout choices, and JSON blueprints for common editor shapes. For the non-layout side (action maps, keymaps, transformation/substitute menus) use `mps-aspect-editor-menus-and-keymaps`.
+type: reference
+---
+
+# MPS Editor — Technical Reference
+
+## Loading companion skills
+
+Companion names in this skill are lazy dependencies: load only those relevant to the current task. If this skill came from an MCP server, use the host's skill loader to resolve the companion's unique discovered entry URI on the same host-assigned originating server. If the host has no server-backed skill loader, stop and report that limitation; do not silently fall back to a filesystem copy. If this skill came from a filesystem catalog, load the named sibling from that same catalog at `<skills-root>/<skill-name>/SKILL.md`, even if remote skill loaders are also available. Do not invent a tool name or server endpoint.
+
+The `jetbrains.mps.lang.editor` language defines projectional editors as trees of **cell models** (display elements) with **cell layouts** and **style items**. This skill is the technical lookup: concept names, suffixes, style classes, and the rules that decide which cell model to use where.
+
+## Critical Directives
+
+- **Always use `CellModel_RefNodeList` for `0..n` or `1..n` children.** `CellModel_RefNode` is for single cardinality only.
+- **Use `IndentLayoutOnNewLineStyleClassItem`** (apply to the cell that should start on a new line) instead of the legacy `IndentLayoutNewLineStyle` (applied to the cell *before* the break) — the latter is easier to get wrong.
+- **Reference cells**: set the internal `CellModel_Property` (e.g. `name`) inside an `InlineEditorComponent` to `readOnly=true` so the referenced target cannot be accidentally renamed through the editor.
+- **Smart references**: no wrapping layout cell — just a single `CellModel_RefCell` whose `editorComponent` is an `InlineEditorComponent` with a `CellModel_Property` (`relationDeclaration: name`, `readOnly: true`).
+- **List empty state**: a `CellModel_RefNodeList` already synthesizes an editable empty cell, shown as `<< ... >>` (caret lands there, `Ctrl+Space` works). Add an explicit `emptyCellModel` (e.g. a `CellModel_Constant "<no items>"`) only to customize the empty cell — but a plain constant is read-only and loses the instant-typing, so to keep it, put the hint in the constant's `nullText` (not `text`) and add an `EditableStyleClassItem` (`flag=true`). See the *Editable Empty-List Placeholder* pattern in `references/editor-patterns.md`.
+- **Inheritance**: components can be reused if defined for the concept, its super-concepts, or implemented interfaces.
+- **Componentize shared cells**: when several concept editors repeat the same cell group, factor it into an `EditorComponentDeclaration` (bound to the most general concept or interface that owns the relations) and reuse it via `CellModel_Component`. See `references/editor-components.md`.
+- **Stylesheets**: check for existing style classes in extended languages before creating new ones in a `StyleSheet` node. Apply a class with the cell's `parentStyleClass` reference or an `ApplyStyleClass` style item (`references/cell-models.md`).
+
+## Common Workflow
+
+0. **Check whether the editor model already exists — it almost always does.** `editor` is one of a language's default aspects (alongside `structure`, `constraints`, `behavior`, `typesystem`), so any non-trivial language already has it. Confirm with `mps_mcp_get_project_structure` (it lists the module's models) before doing anything else. Only when a brand-new language genuinely has no editor model do you create one — with `mps_mcp_create_model` with `moduleName: "<lang>"` and `modelName: "<lang>.editor"` (aspect ID `editor`, case-sensitive, no `@` suffix; see [aspect-model-stereotypes.md](references/aspect-model-stereotypes.md)). Action maps, keymaps, transformation/substitute menus live in the **same** `editor` model — there is no separate aspect ID for them.
+1. **Scaffold first** — `mps_mcp_scaffold_editor` builds a default editor that wires properties/children/references to sensible cell models. The scaffold is a starting point, not a finished editor: it emits the concept alias, a `Name:` label, and one `<role>:` label per feature, each on its own line (`servings: { servings }`). An editor left in that shape is still a scaffold, however many labels it shows, and a task that asks for readable editors is not done until step 3 has changed it. For a featureless marker concept the scaffold also creates an empty default `SubstituteMenu` and says so in its result. That menu hides the concept from completion, so delete it if users must be able to pick the concept.
+2. **Componentize** reusable cell groups into an `EditorComponentDeclaration` and embed them with `CellModel_Component` — see `references/editor-components.md` for the manual and `mps_mcp_scaffold_editor` (`type="component"`, `includeComponents`, `detectComponents`) paths.
+3. **Refine cell choice and layout** using the catalog below. The minimum refinement for every non-wrapper concept: replace the role labels with the words and symbols a user of the DSL would write (`serves { servings }`, `( { minutes } min )`, `->`), put the alias and the name on one row (`recipe { name }` instead of `recipe` / `Name: { name }`), and keep only the children lists on their own indented lines. Smart-reference wrappers (`( % ref % -> { name } )`) need no refinement.
+4. **Inspect** with `mps_mcp_print_node` (structural, textual or HTML projection).
+5. **Validate** with `mps_mcp_check_root_node_problems`.
+
+## Node cell layout vs. inspected cell layout
+
+A `ConceptEditorDeclaration` holds **two** editor sections:
+
+- **Node cell layout** — the `cellModel` child (cardinality `1`). The main editor, shown inline in the document where the node appears.
+- **Inspected cell layout** — the `inspectedCellModel` child (cardinality `0..1`). A *secondary* definition shown in the **Inspector** tool window when the caret is on this node in the main editor. Typically used for less-important or less-frequently read/modified properties so they stay out of the main layout.
+
+Both roles accept any `EditorCellModel` and are built the same way (collections, property cells, ref cells, …). The inspected section is optional — omit `inspectedCellModel` when everything belongs in the main editor. See `references/editor-patterns/inspected-cell-layout.md`.
+
+## Related Skills
+
+- **`mps-aspect-editor-menus-and-keymaps`** — for action maps, cell keymaps, transformation menus, substitute menus, side transforms, paste wrappers, copy-paste handlers, completion styling, and reference presentation. Use this skill alongside that one when authoring an editor end-to-end. Legacy cell menus (property values, postfix hints) are in `references/legacy-cell-menus.md` in the `mps-aspect-editor-menus-and-keymaps` skill root after loading that companion skill from the same origin.
+- **`mps-aspect-structure-concepts`** — concept declarations supply the relations (properties / children / references) the editor wires up.
+- **`mps-language-aspects-overview`** — for the broader authoring order around editors.
+
+## Reference Index
+
+**Start here — most common case**: laying out cells for one concept → read only `references/cell-models.md`; a known layout shape (child on its own line, indented block, vertical list) → only `references/editor-patterns.md`; a style item's accepted literals → only `references/stylesheet-values.md`.
+
+- Open `references/cell-models.md` for the catalog of cell-model concepts (`ConceptEditorDeclaration`, `EditorComponentDeclaration`, `CellModel_Collection`, `CellModel_Constant`, `CellModel_Property`, `CellModel_ReadOnlyModelAccessor`, `CellModel_RefNode`, `CellModel_RefNodeList`, `CellModel_RefCell`, `CellModel_Component`, `InlineEditorComponent`) with their suffixes and purpose, plus how to style a cell (style class, punctuation), the concept-alias cell, the `node` parameter of cell queries, computed/editable text cells (`CellModel_ReadOnlyModelAccessor`, `CellModel_ModelAccess`), `CellModel_Alternation` vs `renderingCondition`, list separators, and matching braces.
+- Open `references/indent-layout-styles.md` for the style-item catalog (`IndentLayoutOnNewLineStyleClassItem`, `IndentLayoutIndentStyleClassItem`, `IndentLayoutNewLineChildrenStyleClassItem`, `SelectableStyleSheetItem`) used inside `CellLayout_Indent`.
+- Open `references/editor-patterns.md` for ready-to-paste JSON / pseudo-code patterns: indented child on a new line, named concept with keyword header, transparent list, smart-reference cell, a minimal `ConceptEditorDeclaration` JSON template, a concept editor with an inspected cell layout, the empty-constant vertical-gap separator, the editable empty-list placeholder with a disappearing `nullText` hint (`EditableStyleClassItem`), and the annotation (node attribute) editor with `CellModel_AttributedNodeCell` (`attributed node`), guillemet labels, and keyboard-deletability.
+- Open `references/editor-components.md` for how to factor editor design into reusable editor components: what an `EditorComponentDeclaration` is, the inheritance rule, and step-by-step manual (`mps_mcp_insert_root_node_from_json` + `CellModel_Component`) and scaffold (`mps_mcp_scaffold_editor`) recipes with a worked Kaja example, and how a sub-concept overrides an inherited component (`overridenEditorComponent`).
+- Open `references/stylesheet-values.md` for dynamic (query) style values and the enum literals (plain property values) accepted by stylesheet items: `_Colors_Enum` (`darkBlue`, `gray`, `darkGreen`, `black`, …) for `ForegroundColorStyleClassItem.color` and other color items, `_FontStyle_Enum` (`PLAIN`, `BOLD`, `ITALIC`, `BOLD_ITALIC`, `QUERY`) for `FontStyleStyleClassItem.style`, plus `UnderlineStyle` and `FocusPolicy`.
