@@ -7,19 +7,19 @@
 
 | ID | Requisito de la guía | Implementación en Domus | Sesión | Evidencia | Estado |
 |---|---|---|---|---|---|
-| A1 | Mínimo 10–15 conceptos propios del dominio | 28 conceptos (`02_ESPECIFICACION_FORMAL.md` §1.1) | S1 | Captura del modelo `structure` | ⬜ |
-| A2 | Uso de herencia (`extends`) | `AlarmState extends State`; jerarquía `RegexExpr` | S1 | Captura de `AlarmState` y `BinaryRegexExpr` | ⬜ |
-| A3 | Interfaces de concepto | `IDeviceElement` (+ `INamedConcept`) | S1 | Captura | ⬜ |
-| A4 | Relaciones de composición/referencia | Hijos de `Device`; refs de `Transition` | S1 | Captura | ⬜ |
+| A1 | Mínimo 10–15 conceptos propios del dominio | 28 conceptos (`02_ESPECIFICACION_FORMAL.md` §1.1) | S1 | Modelo `domus.lang.structure`: 28 raíces (25 conceptos + 2 enums + 1 interfaz según `mps_mcp_get_project_structure`); falta captura de pantalla | ✅ |
+| A2 | Uso de herencia (`extends`) | `AlarmState extends State`; jerarquía `RegexExpr` | S1 | `AlarmState`, `BinaryRegexExpr`/`UnaryRegexExpr` en `domus.lang.structure`; captura pendiente | ✅ |
+| A3 | Interfaces de concepto | `IDeviceElement` (+ `INamedConcept`) | S1 | `IDeviceElement` (con `getDevice()` en behavior); captura pendiente | ✅ |
+| A4 | Relaciones de composición/referencia | Hijos de `Device`; refs de `Transition` | S1 | Hijos de `Device` y refs de `Transition` (`source`, `target`, `event`) en `domus.lang.structure` | ✅ |
 | A5 | Al menos una proyección no textual (`jetbrains.mps.lang.editor.table`, bloques o matriz) | Tabla δ de transiciones en el editor de `Device` | S3 (o S2 si vence el Hito 2) | Captura de la tabla en la Sandbox | ⬜ |
 
 ## Pilar B — Semántica estática
 
 | ID | Requisito | Implementación | Sesión | Evidencia | Estado |
 |---|---|---|---|---|---|
-| B1 | Scoping: referencias solo a elementos válidos del contexto | 7 scopes (§3.1) | S1 | Modelo `invalidos.i1_alcance` + test | ⬜ |
-| B2 | Reglas de tipos (inference o checking) contra errores del dominio | `RoleType` con subtipado, `AlphabetType`; checking rules R-INI, R-UNQ, R-ALM, R-SNS, R-ACY | S1 | Modelos `i2`, `i3`, `i4` + tests | ⬜ |
-| B3 | Errores de dominio tipo "incompatibilidad de unidades o roles" | Rol sin privilegio (i2); alfabetos incompatibles (i3) | S1 | Tests `has error` | ⬜ |
+| B1 | Scoping: referencias solo a elementos válidos del contexto | 7 scopes (§3.1) | S1 | Modelo `invalidos.i1_alcance` (3 errores "out of search scope"); test automático pendiente (S2 Fase 7) | ✅ |
+| B2 | Reglas de tipos (inference o checking) contra errores del dominio | `RoleType` con subtipado, `AlphabetType`; checking rules R-INI, R-UNQ, R-ALM, R-SNS, R-ACY | S1 | Modelos `i2`, `i3`, `i4` con sus errores; tests `has error` pendientes (S2 Fase 7) | ✅ |
+| B3 | Errores de dominio tipo "incompatibilidad de unidades o roles" | Rol sin privilegio (i2); alfabetos incompatibles (i3) | S1 | Mensajes de i2 (rol) e i3 (alfabeto) verificados con `check_root_node_problems`; tests `has error` pendientes | ✅ |
 
 ## Pilar C — Razonador (núcleo)
 
@@ -40,10 +40,10 @@
 
 | ID | Requisito | Sesión | Evidencia | Estado |
 |---|---|---|---|---|
-| H2-1 | Repo Git con proyecto MPS funcional | S1 | Enlace + tag `v0.2-hito2` | ⬜ |
-| H2-2 | Structure, Editor, Constraints, Typesystem completos | S1 (+ tabla S3) | Rebuild limpio | ⬜ |
-| H2-3 | ≥ 3 modelos válidos en la Sandbox | S1 | `validos.v1..v3` | ⬜ |
-| H2-4 | ≥ 3 modelos inválidos que muestren errores de contexto y tipos | S1 | `invalidos.i1..i4` | ⬜ |
+| H2-1 | Repo Git con proyecto MPS funcional | S1 | Rama `feature/s1-estructura-semantica` + PR S1; tag `v0.2-hito2` pendiente | 🟨 |
+| H2-2 | Structure, Editor, Constraints, Typesystem completos | S1 (+ tabla S3) | Structure, Editor, Constraints y Typesystem hechos; tabla δ queda para S3 | 🟨 |
+| H2-3 | ≥ 3 modelos válidos en la Sandbox | S1 | `domus.lang.sandbox.validos.v1_cerradura`, `v2_alarma`, `v3_casa`: 0 errores | ✅ |
+| H2-4 | ≥ 3 modelos inválidos que muestren errores de contexto y tipos | S1 | `domus.lang.sandbox.invalidos.i1_alcance`..`i4_restricciones`: 3, 1, 1 y 5 errores | ✅ |
 
 ## Hito 3
 

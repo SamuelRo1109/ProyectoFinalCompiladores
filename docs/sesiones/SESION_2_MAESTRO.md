@@ -23,11 +23,11 @@
 2. `git clone <repo> && cd domus-dsl-mps && git checkout develop`
 3. Trae la rama de S1: `gh pr checkout <número-del-PR-S1>`
 4. Abre en MPS la carpeta `domus/`. `Ctrl+Shift+A` → **Install MPS VCS Add-ons**.
-5. `Settings → Tools → MCP Server`: anota el puerto; en **Exposed Tools** deja solo las `mps_mcp_*`. Si el puerto no es `64342`, cámbialo en `.mcp.json` **sin commitearlo** (o usa `claude mcp add --transport http mps http://localhost:<puerto>/stream --scope local`).
+5. (Claude Code debe correr en la misma PC que MPS.) `Settings → Tools → MCP Server`: anota el puerto; en **Exposed Tools** deja solo las `mps_mcp_*`. Si el puerto no es `64342`, cámbialo en `.mcp.json` **sin commitearlo** (o usa `claude mcp add --transport http mps http://localhost:<puerto>/stream --scope local`).
 6. `claude` en la raíz → `/mcp` → `mps` conectado. Las skills `mps-*` ya vienen en `.claude/skills/`: **no** ejecutes la inicialización salvo que tu build de MPS sea distinta (en ese caso, pide refrescarlas).
 7. **Revisa el PR de S1** con esta lista y apruébalo en GitHub (`gh pr review --approve`) o pide cambios:
    - [ ] `Build → Rebuild Project` sin errores (salvo los modelos `invalidos.*`, que tienen errores a propósito).
-   - [ ] `validos.v1..v3` sin errores; `invalidos.*` muestran su error.
+   - [ ] `validos.v1..v3` sin errores; `invalidos.*` muestran su error (esperado: i1=3, i2=1, i3=1, i4=5; en i4 el nombre `2estado` da 2 errores, ver `HANDOFF_S1.md` §4).
    - [ ] La estructura coincide con `02_ESPECIFICACION_FORMAL.md`.
    - **Prompt útil:** *"Revisa el estado del proyecto MPS: valida todos los modelos de domus.lang.sandbox y del lenguaje domus.lang y dame un resumen de problemas por modelo."*
 8. Haz merge del PR en GitHub. Luego:
@@ -37,7 +37,9 @@ git checkout -b feature/s2-razonador-generador
 ```
 
 ## FASE 1 — Pendientes de S1 (si los hay)
-Haz primero lo que `HANDOFF_S1.md` deja en P1 (normalmente typesystem o modelos inválidos), usando los prompts de las fases 5 y 6 de `SESION_1_MAESTRO.md`.
+S1 terminó Structure, Behavior, Editor, Constraints, Typesystem y los 7 modelos de la Sandbox. Lo único que deja es lo de `HANDOFF_S1.md` §3 (tests, mensaje en español de i1, tabla δ). No rehagas typesystem ni modelos inválidos; si algo falta, revísalo con `check_root_node_problems` sobre `domus.lang.sandbox`.
+
+**Nombres reales a tener presentes:** los modelos de la sandbox se llaman `domus.lang.sandbox.validos.v1_cerradura` … `domus.lang.sandbox.invalidos.i4_restricciones` (solution `domus.lang.sandbox`, carpeta `domus/languages/domus.lang.sandbox`). Ya existen en `domus.lang` los behavior `Device.initialStates()`, `HomeSystem.allEvents()`, `Role.ancestors()`, `IDeviceElement.getDevice()` y las reglas `check_*` (R-INI, R-UNQ, R-ALM, R-SNS, R-ACY, nombres) y `typeof_*`; **no las dupliques**: las reglas del razonador (Fase 5) van en roots distintos. Las solutions `domus.reasoner` y `domus.tests` **aún no existen**; créalas tú.
 
 ---
 
@@ -165,7 +167,8 @@ Carga la skill mps-tests. Crea la solution domus.tests con un modelo de pruebas 
 que use jetbrains.mps.lang.test, jetbrains.mps.baseLanguage.unitTest y domus.lang.
 
 A) NodesTestCase de ERRORES (uno por regla), con anotaciones "has error"/"has typesystem error"
-   sobre el nodo exacto: alcance (i1), roles (i2), alfabeto (i3), R-INI, R-ALM, R-SNS, R-ACY,
+   sobre el nodo exacto. Ojo: i1 usa el mensaje por defecto de MPS (en inglés) y i4 duplica el error
+   de nombre (restricción de propiedad + check_State_NombreValido). Cubre: alcance (i1), roles (i2), alfabeto (i3), R-INI, R-ALM, R-SNS, R-ACY,
    identificador inválido, deadlock, alarma sin recuperación, política REQUIRED violada,
    política FORBIDDEN violada.
 B) NodesTestCase de modelos SANOS: el sistema Cerradura completo sin errores
