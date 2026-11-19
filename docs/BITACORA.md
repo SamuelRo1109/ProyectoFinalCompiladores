@@ -11,6 +11,15 @@
 
 ## Sesión 1 — (Tú)
 
+### Hallazgos de UX al escribir v1_cerradura a mano (insumo para Gaby, S3)
+1. "hereda" (`Role.parent`) y "requiere" (`Event.requiredRole`) solo se pueden asignar desde el Inspector (Alt+2).
+2. Enter al final de una `Transition` crea un `Device` nuevo; solución temporal: seleccionar la línea con Ctrl+W y luego Enter.
+3. Las listas de políticas y escenarios de `HomeSystem` no muestran título ("politicas:", "escenarios:").
+4. Para cambiar un valor de enumeración (REQUIRED→FORBIDDEN) hay que seleccionar la palabra completa antes de Ctrl+Espacio.
+5. "." (`AnySymbolExpr`) y "·" (`ConcatExpr`) se confunden en el menú de completado.
+6. Las regex se construyen de arriba hacia abajo (operador primero y luego los huecos); escribir "a | b" de corrido no funciona todavía (Fase 2 de la S3: side transforms).
+7. Decisión de diseño: → y ◎ solo se muestran cuando `initial`/`accepting` son verdaderos; se alternan con Alt+Enter.
+
 ## Sesión 2 — (Luis)
 
 ## Sesión 3 — (Gaby)
