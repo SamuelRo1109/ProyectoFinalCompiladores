@@ -213,6 +213,8 @@ Un modelo es **válido** si no tiene errores estáticos (§3) ni errores del raz
 2. **Construcción de subconjuntos** con ε-clausura → AFD. Peor caso `O(2^n)` estados.
 3. **Minimización** (Moore, refinamiento de particiones) → AFD mínimo, `O(n²·|Σ|)`.
 
+**Convención:** el AFD mínimo se cuenta COMPLETO, incluyendo el estado sumidero. Así es único salvo isomorfismo y su número de estados es el índice de la relación de Myhill–Nerode. Ejemplo: CicloCompleto tiene 5 estados (4 útiles + sumidero). Mensaje del razonador: "AFD mínimo de N estados (N-1 útiles + sumidero)" (si no hay sumidero, solo "AFD mínimo de N estados"). Las pruebas esperan N con sumidero.
+
 ### 4.4 Verificación de políticas (decidible) con contraejemplo
 
 - `REQUIRED`: `L(A_d) ⊆ L(R)` ⇔ `L(A_d) ∩ (Σ* \ L(R)) = ∅`.
