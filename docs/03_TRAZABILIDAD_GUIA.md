@@ -17,24 +17,24 @@
 
 | ID | Requisito | Implementación | Sesión | Evidencia | Estado |
 |---|---|---|---|---|---|
-| B1 | Scoping: referencias solo a elementos válidos del contexto | 7 scopes (§3.1) | S1 | Modelo `invalidos.i1_alcance` (3 errores "out of search scope"); test automático pendiente (S2 Fase 7) | ✅ |
-| B2 | Reglas de tipos (inference o checking) contra errores del dominio | `RoleType` con subtipado, `AlphabetType`; checking rules R-INI, R-UNQ, R-ALM, R-SNS, R-ACY | S1 | Modelos `i2`, `i3`, `i4` con sus errores; tests `has error` pendientes (S2 Fase 7) | ✅ |
-| B3 | Errores de dominio tipo "incompatibilidad de unidades o roles" | Rol sin privilegio (i2); alfabetos incompatibles (i3) | S1 | Mensajes de i2 (rol) e i3 (alfabeto) verificados con `check_root_node_problems`; tests `has error` pendientes | ✅ |
+| B1 | Scoping: referencias solo a elementos válidos del contexto | 7 scopes (§3.1) | S1 | Modelo `invalidos.i1_alcance` (3 errores "out of search scope"); test automático en `domus.tests` (`ErroresDeReglas`: alcance; `ModelosSanos`: v1–v3 sin falsos positivos) | ✅ |
+| B2 | Reglas de tipos (inference o checking) contra errores del dominio | `RoleType` con subtipado, `AlphabetType`; checking rules R-INI, R-UNQ, R-ALM, R-SNS, R-ACY | S1 | Modelos `i2`, `i3`, `i4` con sus errores; tests `has error` en `domus.tests` (`ErroresDeReglas`: roles, alfabeto, R-INI/R-UNQ/R-ALM/R-SNS/R-ACY; `ModelosSanos`) | ✅ |
+| B3 | Errores de dominio tipo "incompatibilidad de unidades o roles" | Rol sin privilegio (i2); alfabetos incompatibles (i3) | S1 | Mensajes de i2 (rol) e i3 (alfabeto) verificados con `check_root_node_problems`; tests `has error` en `domus.tests` (`ErroresDeReglas`: roles y alfabeto; `ModelosSanos`) | ✅ |
 
 ## Pilar C — Razonador (núcleo)
 
 | ID | Requisito | Implementación | Sesión | Evidencia | Estado |
 |---|---|---|---|---|---|
-| C1 | Verificador de consistencia (ciclos, inalcanzables, deadlocks, contradicciones) | §4.2: inalcanzables, trampas, deadlocks, no determinismo, alarmas; ciclos de roles (R-ACY) | S2 | Errores/warnings en vivo en el editor + tests | ⬜ |
-| C2 | Motor de inferencia (derivar conclusiones nuevas) | Traza mínima a alarma, contraejemplos de políticas, AFD mínimo, ER equivalente (Kleene 2) | S2 | Reporte generado + tests | ⬜ |
-| C3 | Simulador operacional (paso a paso) | §4.6 escenarios con traza de estados | S2 | Salida del `main` generado + tests | ⬜ |
+| C1 | Verificador de consistencia (ciclos, inalcanzables, deadlocks, contradicciones) | §4.2: inalcanzables, trampas, deadlocks, no determinismo, alarmas; ciclos de roles (R-ACY) | S2 | `check_Device_Razonador` y `check_Policy_Razonador` (errores/warnings en vivo); pruebas `ErroresDeReglas`, `AdvertenciasDelRazonador` y `RazonadorTest` en `domus.tests` | ✅ |
+| C2 | Motor de inferencia (derivar conclusiones nuevas) | Traza mínima a alarma, contraejemplos de políticas, AFD mínimo, ER equivalente (Kleene 2) | S2 | `domus.reasoner` (`Razonador`: traza mínima, contraejemplo, AFD mínimo, Kleene 2) + reporte de `ReporteDomus`; `InferenciasCerradura` y `RazonadorTest` | ✅ |
+| C3 | Simulador operacional (paso a paso) | §4.6 escenarios con traza de estados | S2 | `Scenario.toWord` + `check_Scenario_Razonador`; salida del `main` generado en `source_gen` (v1); `RazonadorTest` | ✅ |
 
 ## Pilar D — Uso práctico y generación
 
 | ID | Requisito | Implementación | Sesión | Evidencia | Estado |
 |---|---|---|---|---|---|
 | D1 | Un usuario externo escribe un modelo completo en la Sandbox y obtiene un resultado | Guía de usuario + caso demo | S3 | Prueba con alguien ajeno al equipo | ⬜ |
-| D2 | Traducción a artefacto útil (código, JSON/XML o reporte) | Clase Java ejecutable + reporte de verificación | S2 | Archivos en `source_gen` + ejecución | ⬜ |
+| D2 | Traducción a artefacto útil (código, JSON/XML o reporte) | Clase Java ejecutable + reporte de verificación | S2 | Plantilla `GeneratedHomeSystem_Plantilla` → Java ejecutable + reporte en `source_gen` (generar `v1_cerradura` y ejecutar); falta captura | ✅ |
 
 ## Hito 2
 
@@ -49,9 +49,9 @@
 
 | ID | Requisito | Sesión | Evidencia | Estado |
 |---|---|---|---|---|
-| H3-1 | Repositorio final con razonador y generador | S2 | Tag `v1.0-hito3` | ⬜ |
-| H3-2 | Pruebas `jetbrains.mps.lang.test` que validen **errores detectados** | S2 | `NodesTestCase` con `has error` | ⬜ |
-| H3-3 | Pruebas que validen **inferencias generadas** | S2 | Tests del razonador y del reporte | ⬜ |
+| H3-1 | Repositorio final con razonador y generador | S2 | Razonador y generador en rama `feature/s2-razonador-generador`; falta merge a `develop` y tag `v1.0-hito3` (S3) | 🟨 |
+| H3-2 | Pruebas `jetbrains.mps.lang.test` que validen **errores detectados** | S2 | `NodesTestCase` con `has error` en `ErroresDeReglas` y `AdvertenciasDelRazonador` (solution `domus.tests`, 60 pruebas en verde) | ✅ |
+| H3-3 | Pruebas que validen **inferencias generadas** | S2 | `InferenciasCerradura` (tipos, `has type`) y `RazonadorTest` (BTestCase) en `domus.tests` | ✅ |
 | H3-4 | Video 12–15 min, los 3 participan, estructura obligatoria | Final | Video | ⬜ |
 
 ## Mapeo obligatorio MPS ↔ Teoría de la Computación (para documento y video)

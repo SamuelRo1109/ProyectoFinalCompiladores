@@ -219,7 +219,7 @@ Un modelo es **válido** si no tiene errores estáticos (§3) ni errores del raz
 
 - `REQUIRED`: `L(A_d) ⊆ L(R)` ⇔ `L(A_d) ∩ (Σ* \ L(R)) = ∅`.
   Se construye `M_R` (AFD mínimo completo de `R`), su complemento, y el **autómata producto** `A_d × ¬M_R`. Si existe un estado `(p, s)` alcanzable con `p ∈ F` y `s ∉ F_R`, la política se viola; el BFS devuelve la **palabra mínima** `w` como contraejemplo.
-- `FORBIDDEN`: `Tr(A_d) ∩ L(Σ*·R·Σ*) = ∅` (el patrón `R` nunca ocurre como subsecuencia contigua de una traza). Producto `A_d^{Tr} × M_{Σ*RΣ*}`.
+- `FORBIDDEN`: `Tr(A_d) ∩ L(Σ*·R·Σ*) = ∅` (el patrón `R` nunca ocurre como subsecuencia contigua de una traza). Producto `A_d^{Tr} × M_{Σ*RΣ*}`. **Convención de reporte:** el AFD mínimo que se informa para una política `FORBIDDEN` es el de `R` (no el de `Σ*·R·Σ*`), y ese es el N del mensaje.
 - Costo: `O(|Q_d| · |Q_R| · |Σ|)` tras determinizar `R`. Contexto teórico: la inclusión entre AFN es PSPACE-completa; por eso solo se determiniza la política (normalmente pequeña) y nunca el producto completo de AFN.
 
 ### 4.5 Teorema de Kleene, parte 2 (AF → ER)
@@ -241,8 +241,8 @@ Todas las propiedades anteriores son **decidibles** porque los modelos son autó
 
 | Salida | Tecnología MPS | Contenido |
 |---|---|---|
-| `GeneratedHomeSystem_<Nombre>.java` | Generator (plantillas BaseLanguage) | `enum` de estados y eventos por dispositivo, método `step`, `main` que ejecuta cada escenario e imprime la traza |
-| `reporte_<Nombre>` (texto estructurado o JSON) | TextGen o código generado que lo imprime | Resultado del razonador: inalcanzables, deadlocks, trampas, alarmas, veredicto de cada política con contraejemplo, tamaño del AFD mínimo, ER equivalente (Kleene 2) |
+| `GeneratedHomeSystem_<Nombre>.java` | Generator (plantillas BaseLanguage) | `String[]` con los nombres de estados y eventos por dispositivo y `int[][][]` para δ (en vez de `enum`, por robustez del generador), método `step`, `main` que ejecuta cada escenario e imprime la traza |
+| `reporte_<Nombre>` (texto estructurado o JSON) | TextGen o código generado que lo imprime | Resultado del razonador: inalcanzables, deadlocks, trampas, alarmas, veredicto de cada política con contraejemplo, tamaño del AFD mínimo, ER equivalente (Kleene 2). El reporte es una **constante calculada en tiempo de generación** con `domus.reasoner` (macros de plantilla) |
 
 ---
 
