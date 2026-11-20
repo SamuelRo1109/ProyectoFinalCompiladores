@@ -29,6 +29,24 @@
 6. Las regex se construyen de arriba hacia abajo (operador primero y luego los huecos); escribir "a | b" de corrido no funciona todavía (Fase 2 de la S3: side transforms).
 7. Decisión de diseño: → y ◎ solo se muestran cuando `initial`/`accepting` son verdaderos; se alternan con Alt+Enter.
 
-## Sesión 2 — (Luis)
+## Sesión 2 — Razonador, generador y pruebas (Luis, 19-nov-2026)
+- **Prototipo** Java (`prototipo-razonador/`) y luego solution `domus.reasoner` en BaseLanguage (modelo `domus.reasoner.automata`: 16 clases, fachada `Razonador`, `Hallazgo`; `selftest` con `TestMain` 87/87). Materializa **AFN/AFD** y la **equivalencia ER ⇔ autómata (Kleene)**.
+- **Behavior**: `RegexExpr.toNfa` (Thompson, 9 conceptos), `Device.alphabet/toNfa/alarmStateIndices/stateName/eventName`, `Scenario.toWord`: traducción del AST a autómatas (semántica denotacional de la ER).
+- **Reglas en vivo**: `check_Device_Razonador` (alcance, trampas, deadlocks, alarmas con traza mínima), `check_Policy_Razonador` (REQUIRED/FORBIDDEN con contraejemplo), `check_Scenario_Razonador` (simulador). Materializa **decidibilidad** de vacío, inclusión y equivalencia en lenguajes regulares.
+- **Generador**: plantilla `GeneratedHomeSystem_Plantilla` (regla raíz `HomeSystem`) + `ReporteDomus`; produce Java ejecutable y reporte de verificación (**semántica operacional**: el simulador ejecuta δ paso a paso).
+- **Pruebas**: `domus.tests`, 60 en verde (`ErroresDeReglas`, `AdvertenciasDelRazonador`, `ModelosSanos`, `InferenciasCerradura`, `RazonadorTest`).
+- **Hallazgo del razonador**: la política `SesionCompleta` de v2 era más estricta que el dispositivo (contraejemplo `armar · disparar · tiempoEntrada · autoSilencio · disparar · desarmar`). Se corrigió SOLO la política, añadiendo `(disparar · tiempoEntrada · autoSilencio)*` tras `armar` (lema de Arden). Decisión tomada en S2 sin consulta; reversible en 1 commit si prefieren cambiar el destino de `autoSilencio`.
+- Difícil: Java del sistema < 21 al correr pruebas (usar el JBR de MPS); conexión MCP en Windows (SSE).
+
+### Tabla de complejidad (para el "Análisis crítico" del video)
+| Algoritmo | Complejidad | Nota |
+|---|---|---|
+| Thompson (ER → AFN-ε) | O(\|r\|), ≤ 2\|r\| estados | construcción lineal |
+| Subconjuntos (AFN → AFD) | O(2^n) peor caso | rara vez se alcanza en la práctica |
+| Minimización de Moore | O(n²·\|Σ\|) | refinamiento de particiones |
+| BFS: alcanzabilidad, co-alcanzabilidad, trampas, deadlocks | O(\|Q\|+\|δ\|) | recorrido de grafo |
+| Producto de políticas | O(\|Q_d\|·\|Q_R\|·\|Σ\|) tras determinizar R | la inclusión entre AFN es PSPACE-completa: por eso solo se determiniza R |
+| Eliminación de estados (AFD → ER, Kleene 2) | O(n³) operaciones; ER de tamaño hasta exponencial | |
+| Simulador de escenarios | O(\|w\|·(\|Q\|+\|δ\|)) | w = palabra del escenario |
 
 ## Sesión 3 — (Gaby)

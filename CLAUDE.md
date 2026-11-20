@@ -18,6 +18,12 @@ S1 (Structure, Editor básico, Constraints, Typesystem, Sandbox) → S2 (razonad
 6. Si la misma operación falla dos veces, **detente** y dale al humano los pasos manuales exactos en la GUI de MPS.
 7. Si una llamada se cuelga, avisa: probablemente hay un diálogo modal abierto en MPS.
 8. No toques `source_gen/`, `classes_gen/`, `test_gen/` (son generados).
+9. Para validar un MÓDULO completo con `mps_mcp_check_root_node_problems` usa su referencia con UUID (p. ej. `domus.lang.sandbox` = `cfc81463-1f55-4000-b9e6-5b945feb3b42(domus.lang.sandbox)`); el nombre solo resuelve al modelo homónimo, que no tiene roots.
+
+## Conexión MCP en Windows
+Si `/mcp` muestra "couldn't load tools: InvalidHTTPResponse" con el `.mcp.json` del repo (transporte `/stream`), registra el servidor por SSE con la cabecera del proyecto, solo en tu PC (no se commitea):
+`claude mcp add --transport sse mps http://127.0.0.1:64342/sse --header "IJ_MCP_SERVER_PROJECT_PATH: <ruta>/domus" --scope local`
+En MPS: Settings → Tools → MCP Server → Enable; en Exposed Tools deja habilitadas solo las `mps_mcp_*` (sin router-only mode); no uses los botones Auto-Configure. Cualquier diálogo abierto en MPS bloquea al agente.
 
 ## Convenciones del lenguaje
 - Nombres de conceptos en inglés (como en la especificación); **alias, palabras clave y mensajes de error en español**.
@@ -61,7 +67,7 @@ Si las llamadas MCP fallan en toda la sesión con `java.net.URISyntaxException: 
 ## Reglas para el trabajo con MPS
 - Antes de editar un aspecto (typesystem, constraints, behavior, editor, generator, structure) carga también su skill `mps-aspect-*`.
 - Antes de crear/editar modelos en un lenguaje con skill DSL local (`.agents/skills/<dsl>-dsl/` o `.claude/skills/<dsl>-dsl/`), cárgala. Refréscala con `mps-dsl-memory` al descubrir detalles nuevos.
-- Pasa `projectPath` en **cada** llamada `mps_mcp_*`: aquí es `D:/ProyectoFinalCompiladores/domus` (nunca la raíz del repo).
+- Pasa `projectPath` en **cada** llamada `mps_mcp_*`: el que devuelva `mps_mcp_list_open_projects` para la carpeta `domus/` (Samuel: `D:/ProyectoFinalCompiladores/domus`, Luis: `C:/ProyectoFinalCompiladores/domus`); nunca la raíz del repo.
 - Si hay varios proyectos MPS abiertos y no es obvio cuál, pregunta al usuario.
 
 ## Skills

@@ -54,7 +54,7 @@ La lista completa, requisito por requisito, está en `03_TRAZABILIDAD_GUIA.md`. 
 | Conflictos de merge en `.mps` | Baja | Sesiones secuenciales (nunca dos personas editando a la vez) + merge driver de MPS |
 | Tabla con `jetbrains.mps.lang.editor.table` | Media | Asignada a Gaby con plan B documentado |
 | Límites de uso de Claude Code | Media | Trabajar por fases, `/clear` entre fases, tool search activo, prototipar algoritmos en Java plano (barato) |
-| Fecha de Hito 2 antes de la Sesión 3 | ? | Si el Hito 2 vence antes de que Gaby trabaje, la tabla δ se adelanta a la Sesión 2 |
+| Fecha de Hito 2 antes de la Sesión 3 | ✅ Resuelto | Sin fechas por hito; entrega final conjunta (24-nov-2026). La tabla δ es de la S3. |
 
 **Realismo para hoy**: si empiezas pasadas las 11 p. m., lo alcanzable esta noche es el bloque P0 de la Sesión 1 (setup + structure + editores básicos + scopes). Los bloques P1 (typesystem y modelos inválidos) se pueden cerrar mañana temprano antes de pasarle el relevo a Luis. El .md maestro de la Sesión 1 marca las prioridades.
 
@@ -114,6 +114,7 @@ feature             feature/s1-…    feature/s2-…  feature/s3-…
 - `main` y `develop` **protegidas**: solo por Pull Request, **mínimo 1 aprobación**, aprobaciones obsoletas se descartan si hay nuevos commits, sin force-push, aplica también a administradores.
 - Nadie aprueba su propio PR. **El relevo de cada sesión es la revisión del PR anterior**: Luis revisa y aprueba el PR de la Sesión 1; Gaby el de la Sesión 2; tú el de la Sesión 3.
 - Ramas: `feature/s1-estructura-semantica`, `feature/s2-razonador-generador`, `feature/s3-editor-ux-qa`, `release/hito-2`, `release/hito-3`, `hotfix/*`.
+- **Nota:** la rama `release/hito-2` ya no se usa (no hay release separada del Hito 2); los tags `v0.2-hito2` y `v1.0-hito3` los pone Gaby en la release final (S3).
 - Commits en español con prefijo: `feat:`, `fix:`, `docs:`, `test:`, `chore:`.
 - **Repositorio privado + protección de ramas** exige GitHub Pro/Team. Opciones: (a) repo público, o (b) activar GitHub Pro gratis con el **GitHub Student Developer Pack** del dueño del repo. El script `scripts/configurar_github.sh` aplica todo.
 - **MPS y Git**: instalar los *MPS VCS Add-ons* (acción `Install MPS VCS Add-ons`, se busca con `Ctrl+Shift+A`). Eso registra el merge driver de modelos y crea el `.gitattributes`. **Nunca** resolver un conflicto de `.mps` editando el XML.
@@ -131,7 +132,7 @@ feature             feature/s1-…    feature/s2-…  feature/s3-…
 | Teoría que materializa | AST/gramática de árboles, sensibilidad al contexto, tipos y subtipado | Kleene 1 y 2, decidibilidad de inclusión, grafos, semántica operacional/denotacional | Sintaxis concreta, edición proyectiva sin ambigüedad |
 | Entrada | Este kit | `HANDOFF_S1.md` + PR de S1 | `HANDOFF_S2.md` + PR de S2 |
 | Salida | PR → `develop` + `HANDOFF_S1.md` | PR → `develop` + `HANDOFF_S2.md` | PR → `develop`, `release/hito-3` → `main`, tag `v1.0-hito3` |
-| Release | `release/hito-2` → `main` (tag `v0.2-hito2`) cuando la tabla esté lista o si vence el Hito 2 | — | Release final |
+| Release | Sin release separada del Hito 2; Gaby pone los tags `v0.2-hito2` y `v1.0-hito3` en la release final (S3). | — | Release final |
 
 **Definition of Done común a todas las sesiones**
 - `Rebuild` del proyecto sin errores (los modelos inválidos sí tienen errores, a propósito).
