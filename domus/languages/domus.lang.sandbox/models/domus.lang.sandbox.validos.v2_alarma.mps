@@ -167,8 +167,27 @@
       <node concept="1yJP7y" id="3S1cLRl0crJ" role="1yJP7j">
         <node concept="1yJP7v" id="3S1cLRl0crK" role="1yJP7o">
           <node concept="1yJP7z" id="3S1cLRl0crL" role="1yJP7o">
-            <node concept="1yJP7B" id="3S1cLRl0crM" role="1yJP7u">
-              <ref role="1yJP7r" node="3S1cLRl0crt" resolve="armar" />
+            <node concept="1yJP7z" id="2y5ZLywcAtv" role="1yJP7u">
+              <node concept="1yJP7B" id="2y5ZLywcAtw" role="1yJP7u">
+                <ref role="1yJP7r" node="3S1cLRl0crt" resolve="armar" />
+              </node>
+              <node concept="1yJP7y" id="2y5ZLywcAtx" role="1yJP7p">
+                <node concept="1yJP7v" id="2y5ZLywcAty" role="1yJP7o">
+                  <node concept="1yJP7z" id="2y5ZLywcAtz" role="1yJP7o">
+                    <node concept="1yJP7B" id="2y5ZLywcAt$" role="1yJP7u">
+                      <ref role="1yJP7r" node="3S1cLRl0crv" resolve="disparar" />
+                    </node>
+                    <node concept="1yJP7z" id="2y5ZLywcAt_" role="1yJP7p">
+                      <node concept="1yJP7B" id="2y5ZLywcAtA" role="1yJP7u">
+                        <ref role="1yJP7r" node="3S1cLRl0crw" resolve="tiempoEntrada" />
+                      </node>
+                      <node concept="1yJP7B" id="2y5ZLywcAtB" role="1yJP7p">
+                        <ref role="1yJP7r" node="3S1cLRl0crx" resolve="autoSilencio" />
+                      </node>
+                    </node>
+                  </node>
+                </node>
+              </node>
             </node>
             <node concept="1yJP7v" id="3S1cLRl0crN" role="1yJP7p">
               <node concept="1yJP7w" id="3S1cLRl0crO" role="1yJP7o">
