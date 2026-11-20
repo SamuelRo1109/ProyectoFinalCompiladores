@@ -16,6 +16,7 @@
     <import index="qn6s" ref="r:c823ce89-c6b0-4efd-880d-e9237068d5b3(domus.lang.constraints)" />
     <import index="tpck" ref="r:00000000-0000-4000-0000-011c89590288(jetbrains.mps.lang.core.structure)" />
     <import index="yke2" ref="r:4dce9d5d-5ab6-48ea-bb93-9da0a6a589ad(domus.lang.behavior)" />
+    <import index="op1a" ref="r:edb40588-6aa3-4d1b-9aa3-15b2491e5c9f(domus.reasoner.automata)" />
   </imports>
   <registry>
     <language id="af65afd8-f0dd-4942-87d9-63a55f2a9db1" name="jetbrains.mps.lang.behavior">
