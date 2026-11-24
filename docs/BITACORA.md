@@ -96,3 +96,23 @@ Por eso un deadlock (que según §4.2 también está en `Reach \ CoReach`) solo 
 - **Verificación:** Rebuild de `domus.lang` correcto; conteos de la sandbox sin cambios (v1–v3 = 0 E; i1 = 3 E + 1 W; i2 = 1 E + 1 W; i3 = 1 E; i4 = 5 E); revisión visual en MPS de v1 y v3.
 - **Capturas:** antes `docs/img/antes_estilos_v3.png`; después `docs/img/despues_estilos_v1.png` y `docs/img/despues_estilos_v3.png`.
 - **Concepto:** la **sintaxis concreta** es solo una proyección del AST. Cambiar colores, plegado o textos guía no toca la sintaxis abstracta ni la semántica, por eso los conteos de validación no se mueven.
+
+### Fase 6 — Caso demo y guion (23-nov-2026)
+- **Modelo nuevo** `domus.lang.sandbox.demo.caso_en_vivo` (sistema `CasaDemo`), guardado en estado correcto (**0 errores**) y generable (sin "Do not generate"):
+  - 2 roles (`Residente hereda Invitado`);
+  - 2 dispositivos: Puerta y Luz, con 2 estados y 2 transiciones cada uno;
+  - 2 políticas: `CicloPuerta` [REQUIRED] `(abrir · cerrar)*` y `NoAbrirDosVeces` [FORBIDDEN] `abrir · abrir`;
+  - 1 escenario: `EntradaResidente`, actor Residente.
+- **Guion** `docs/GUION_DEMO.md` para Erika, clic por clic, ≈ 5 min, en cinco pasos:
+  1. escribir con la tabla δ (evento `atenuar`, estado `Atenuada`, dos filas);
+  2. error de alcance (pegar una fila de Luz en Puerta) y error de tipos (actor `Invitado`);
+  3. deadlock (borrar la salida de `Atenuada`) y política violada (`abrir · cerrar`) con su contraejemplo;
+  4. corregir con Ctrl+Z;
+  5. generar, ejecutar con el JBR de MPS y leer el reporte.
+
+  Incluye la preparación, qué decir en cada paso (enlazado con la teoría) y cómo dejar el modelo como estaba.
+- **Ensayo vía MCP:** se aplicó cada cambio que rompe el modelo, se validó, se copió el mensaje literal al guion y se revirtió. Mensajes obtenidos: 3 × "out of search scope", "Incompatibilidad de roles…", "El estado 'Atenuada' es un bloqueo (deadlock)…", "Política violada: la traza 'abrir · cerrar' contiene el patrón prohibido". Al terminar, `caso_en_vivo` = 0 errores y el resto de la sandbox sin cambios.
+- **Generación y ejecución:** Make del modelo correcto. El `main` se compiló y ejecutó con el `javac`/`java` del JBR de MPS (Java 25); la salida real está en el guion (ER equivalentes por Kleene 2, AFD mínimos, simulación ACEPTADO).
+  - No se ejecuta desde MPS porque el módulo `domus.lang.sandbox` tiene la compilación en MPS desactivada (`compile="off"`).
+  - El ensayo de la terminal se hizo con Git Bash; los comandos del guion son su equivalente en PowerShell.
+- **Pendiente para Erika:** probar una vez los gestos marcados con ⚠️ en el guion (Enter para añadir evento, coma para añadir estado, Ctrl+V de una fila entre tablas). No se pueden ensayar por MCP.
