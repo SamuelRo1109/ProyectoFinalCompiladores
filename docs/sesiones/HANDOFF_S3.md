@@ -15,7 +15,7 @@
 | Fase 6 — Caso demo | ✅ | Modelo `domus.lang.sandbox.demo.caso_en_vivo` (`CasaDemo`, 0 errores, generable); `docs/GUION_DEMO.md` ensayado vía MCP y en `powershell.exe` |
 | Fase 7 — Guía de usuario | ✅ | `docs/GUIA_USUARIO.md` (instalación, atajos, lenguaje, mensajes literales, generación, pruebas §7.1, ejercicio D1 §8); README con "Inicio rápido" |
 | Fase 8 — QA y auditoría | ✅ | `domus.tests` 60/60 (`docs/img/pruebas_verde.png`); sandbox revalidada; v1 generado y ejecutado; clon limpio sin archivos generados; `03_TRAZABILIDAD_GUIA.md` auditada; decisiones en `02_ESPECIFICACION_FORMAL.md` §7 |
-| Fase 9 — Cierre y relevo | 🟨 | Este handoff y `docs/ENTREGA_ERIKA.md` hechos. Faltan el push, el PR hacia `develop` y los tags (gh no estaba instalado en la PC de Gaby) |
+| Fase 9 — Cierre y relevo | ✅ | Este handoff y `docs/ENTREGA_ERIKA.md`; PR #3 fusionado en `develop` (merge `c476897`); rama `release/hito-3` y PR #4 hacia `main`; plan de tags `v0.2-hito2` (`734ba96`) y `v1.0-hito3` (merge del PR #4) |
 
 ## 2. Cómo verificarlo en 5 minutos
 1. Clona la rama, abre `domus/` en MPS 2026.2 → **Trust Project** → **Build → Rebuild Project** (obligatorio en un clon nuevo).
@@ -35,8 +35,7 @@
 ## 3. Pendiente (en orden de prioridad)
 | Prioridad | Tarea | Por qué quedó pendiente | Responsable |
 |---|---|---|---|
-| P0 | Push de la rama, PR hacia `develop` y merge | gh no estaba instalado/autenticado en la PC de Gaby | Gaby (con gh) |
-| P0 | Tags `v0.2-hito2` y `v1.0-hito3` (H2-1, H3-1) | Se ponen al hacer merge de la release | Equipo |
+| P0 | Merge del PR #4 (`release/hito-3` → `main`) y crear los tags `v0.2-hito2` (`734ba96`) y `v1.0-hito3` (merge del PR #4) | Requiere la aprobación de Luis y Samuel | Gaby, tras la aprobación |
 | P0 | Video de 12–15 min (H3-4) | Fuera del trabajo técnico | Erika (ver `docs/ENTREGA_ERIKA.md`) |
 | P0 | Documento técnico | Fuera del trabajo técnico | Erika |
 | P1 | Prueba con usuario externo (D1) | Requiere una persona ajena al equipo | Erika (hoja en `GUIA_USUARIO.md` §8) |

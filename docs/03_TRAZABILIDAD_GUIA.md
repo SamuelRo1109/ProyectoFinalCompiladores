@@ -40,7 +40,7 @@
 
 | ID | Requisito | Sesión | Evidencia | Estado |
 |---|---|---|---|---|
-| H2-1 | Repo Git con proyecto MPS funcional | S1 | Repo `SamuelRo1109/ProyectoFinalCompiladores`; clon limpio de `feature/s3-editor-ux-qa` verificado en la Fase 8 (sin archivos generados versionados; todos los docs presentes). Pendiente: tags al cerrar la release (Fase 9) | 🟨 |
+| H2-1 | Repo Git con proyecto MPS funcional | S1 | Repo `SamuelRo1109/ProyectoFinalCompiladores` (clon limpio verificado en la Fase 8: sin archivos generados versionados). Tag `v0.2-hito2` en el commit `734ba96` (tabla δ documentada, Hito 2 completo) | ✅ |
 | H2-2 | Structure, Editor, Constraints, Typesystem completos | S1 (+ tabla S3) | Structure, Editor (con tabla δ, S3), Constraints y Typesystem completos | ✅ |
 | H2-3 | ≥ 3 modelos válidos en la Sandbox | S1 | `domus.lang.sandbox.validos.v1_cerradura`, `v2_alarma`, `v3_casa`: 0 errores (revalidado en la Fase 8); además `demo.caso_en_vivo`: 0 errores | ✅ |
 | H2-4 | ≥ 3 modelos inválidos que muestren errores de contexto y tipos | S1 | `domus.lang.sandbox.invalidos.i1_alcance`..`i4_restricciones`: i1 = 3 errores de alcance + 1 warning (inalcanzable); i2 = 1 error + 1 warning; i3 = 1 error; i4 = 5 errores (revalidado en la Fase 8) | ✅ |
@@ -49,7 +49,7 @@
 
 | ID | Requisito | Sesión | Evidencia | Estado |
 |---|---|---|---|---|
-| H3-1 | Repositorio final con razonador y generador | S2 | Razonador y generador integrados en `develop` (PR #2, commit `07d7dc0`); trabajo de S3 en `feature/s3-editor-ux-qa`. Pendiente: tags al cerrar la release (Fase 9) | 🟨 |
+| H3-1 | Repositorio final con razonador y generador | S2 | Razonador y generador en `develop` (PR #2) junto con S3 (PR #3, merge `c476897`). Tag `v1.0-hito3` en el merge de `release/hito-3` a `main` (PR #4) | ✅ |
 | H3-2 | Pruebas `jetbrains.mps.lang.test` que validen **errores detectados** | S2 | `NodesTestCase` con `has error` en `ErroresDeReglas` y `AdvertenciasDelRazonador` (solution `domus.tests`); re-ejecución de la Fase 8: 60 de 60 en verde (Tests passed: 60 of 60, exit code 0) con la configuración «Pruebas Domus»; captura `docs/img/pruebas_verde.png` | ✅ |
 | H3-3 | Pruebas que validen **inferencias generadas** | S2 | `InferenciasCerradura` (tipos, `has type`) y `RazonadorTest` (BTestCase) en `domus.tests`; re-ejecución de la Fase 8: 60 de 60 en verde (Tests passed: 60 of 60, exit code 0) con la configuración «Pruebas Domus»; captura `docs/img/pruebas_verde.png` | ✅ |
 | H3-4 | Video 12–15 min, los 3 participan, estructura obligatoria | Final | A cargo de Erika; guion de la demo en vivo en `docs/GUION_DEMO.md` | 🟨 |
