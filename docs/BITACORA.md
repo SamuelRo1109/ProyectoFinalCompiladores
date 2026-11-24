@@ -80,3 +80,19 @@ Por eso un deadlock (que según §4.2 también está en `Reach \ CoReach`) solo 
 - **Cómo se resolvió (segundo intento):** se quitó el anidamiento; la lista es ahora la rejilla (`gridLayout`). Como el encabezado no puede vivir dentro de la lista y el *padding* de MPS solo admite valores fijos, cada celda muestra el nombre **relleno con espacios hasta el ancho de su columna**. Ese ancho es el del nombre más largo de estados o eventos del dispositivo, con mínimo 7/6 por "Destino"/"Evento", y se aplica al encabezado y a las tres celdas. Con la fuente monoespaciada del editor todo cuadra.
 - **Limitaciones conocidas:** depende de una fuente monoespaciada; una fila nueva se ve desalineada hasta rellenarla (`<origen>`, `<evento>`, `<destino>`); una referencia fuera de alcance (`i1`) usa los anchos del otro dispositivo.
 - **Verificación:** Rebuild de `domus.lang` correcto. Conteos de la sandbox sin cambios (v1–v3 = 0 E; i1 = 3 E + 1 W; i2 = 1 E + 1 W; i3 = 1 E; i4 = 5 E). Verificado a mano en MPS solo con teclado: agregar fila (Enter al final de una fila), rellenar y editar celdas (Ctrl+Espacio, que solo ofrece elementos del dispositivo), borrar fila (Ctrl+W hasta seleccionarla + Delete) y deshacer (Ctrl+Z).
+
+### Fase 3 — Estilos y legibilidad (23-nov-2026)
+- **Qué se aplicó** (solo aspecto editor; se mantiene la sintaxis de §2):
+  - **Palabras clave** (`PalabraClave`): ya estaban en negrita; el color pasó de `darkBlue` a `blue`. En tema oscuro `darkBlue` se ve #3D6DAC, con contraste ≈3:1; `blue` es #0000FF en claro y #589DF6 en oscuro, ambos ≥4.5:1.
+  - **Nombres de dispositivos, políticas y escenarios** (`NombreDestacado`): negrita con el color normal del tema. Máximo contraste y se distinguen de las palabras clave azules.
+  - **Tipo de evento y modo de política** (`ValorSecundario`): cursiva en `gray` (#808080 en ambos temas, ≈4:1). Se descartó `darkGray`: en tema oscuro (#C0C0C0) casi no se distinguía del texto normal.
+  - **Secciones plegables:** `roles:`, cada dispositivo, la lista de políticas y la de escenarios (desde el margen izquierdo).
+  - **Textos guía en listas vacías** (gris, se puede escribir encima): «<agrega un evento>», «<agrega un estado>», «<agrega un rol>», «<sin políticas>», «<sin escenarios>». La tabla δ ya tenía «<sin transiciones>».
+  - **Solo verificado:** `alarma` en rojo (`Alarma`); `→` y `◎` en verde (`Marcador`) en `State` y `AlarmState`.
+- **Tabla δ intacta:** no se cambió fuente, tamaño ni negrita de sus celdas; los anchos por columna siguen iguales (en v1: 12/11/12 caracteres).
+- **Qué se omitió y por qué:**
+  - **Inspector:** ninguna línea está sobrecargada (la más larga, `desbloquear : COMMAND requiere Residente`, se lee bien); `hereda` y `requiere` ya estaban también en el Inspector desde S1.
+  - **Íconos:** no hay ningún `TextIcon` de ejemplo en el proyecto ni en las librerías para copiar. Habría que construir las capas a mano en la estructura de 5 conceptos y reconstruirla, así que no era sencillo. Queda como mejora opcional (íconos PNG).
+- **Verificación:** Rebuild de `domus.lang` correcto; conteos de la sandbox sin cambios (v1–v3 = 0 E; i1 = 3 E + 1 W; i2 = 1 E + 1 W; i3 = 1 E; i4 = 5 E); revisión visual en MPS de v1 y v3.
+- **Capturas:** antes `docs/img/antes_estilos_v3.png`; después `docs/img/despues_estilos_v1.png` y `docs/img/despues_estilos_v3.png`.
+- **Concepto:** la **sintaxis concreta** es solo una proyección del AST. Cambiar colores, plegado o textos guía no toca la sintaxis abstracta ni la semántica, por eso los conteos de validación no se mueven.
