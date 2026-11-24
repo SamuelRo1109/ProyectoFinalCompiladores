@@ -5,6 +5,8 @@
 > **Ensayado** el 23-nov-2026 vía MCP: cada mensaje entre comillas es el **texto literal** que muestra MPS.
 > Lo marcado con ⚠️ son gestos de teclado que no se pudieron ensayar automáticamente: pruébalos una vez antes de grabar.
 
+> **Antes de grabar, haz un ensayo completo una vez; los pasos ⚠️ tienen alternativa si el gesto no funciona.**
+
 ## Qué hay en `CasaDemo` (para orientarte)
 
 ```
@@ -112,7 +114,7 @@ sistema CasaDemo
 ## 4. Corregir y ver todo en verde (≈ 0:30)
 
 **Hacer:**
-1. Pulsa **Ctrl+Z** dos veces (deshace el cambio de la política y el borrado de la fila).
+1. Pulsa **Ctrl+Z** hasta que vuelva el ✓ verde, comprobando que las filas de `Atenuada` siguen en la tabla de Luz (si desaparecen, **Ctrl+Shift+Z**). Normalmente bastan dos: una deshace el cambio de la política y otra el borrado de la fila.
 2. Comprueba el **✓ verde** arriba a la derecha. Pasa el ratón por `politica NoAbrirDosVeces` para enseñar el info: «Info: Política verificada: AFD mínimo de 4 estados (3 útiles + sumidero)».
 
 **Decir:**
@@ -132,6 +134,8 @@ $J = "C:\Program Files\JetBrains\MPS 2026.2\jbr\bin"
 & "$J\javac.exe" -encoding UTF-8 -d "$env:TEMP\domus_demo" "languages\domus.lang.sandbox\source_gen\domus\lang\sandbox\demo\caso_en_vivo\GeneratedHomeSystem_CasaDemo.java"
 & "$J\java.exe" "-Dstdout.encoding=UTF-8" -cp "$env:TEMP\domus_demo" domus.lang.sandbox.demo.caso_en_vivo.GeneratedHomeSystem_CasaDemo
 ```
+
+*(Estas cuatro líneas se ejecutaron tal cual en `powershell.exe` desde `C:\ProyectoFinalCompiladores\domus` el 23-nov-2026: compilan y ejecutan sin errores y las tildes y flechas salen bien. La carpeta `%TEMP%\domus_demo` se crea sola.)*
 
 **Se verá** (salida real del ensayo, con `Atenuada` añadida en el paso 1):
 

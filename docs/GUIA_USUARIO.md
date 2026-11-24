@@ -4,8 +4,6 @@ Domus es un lenguaje para describir una casa inteligente: qué **dispositivos** 
 
 Esta guía es para quien **nunca ha usado MPS**. No necesitas saber programar.
 
-> Las marcas **[captura: …]** indican dónde irá una imagen de pantalla.
-
 ---
 
 ## 1. Instalación
@@ -33,8 +31,7 @@ Esta guía es para quien **nunca ha usado MPS**. No necesitas saber programar.
 3. Si aparece **"Trust and Open Project?"**, pulsa **Trust Project**.
 4. Espera a que termine la barra de progreso de abajo a la derecha (MPS está "indexando" el proyecto).
 
-[captura: pantalla de bienvenida de MPS con el botón Open]
-[captura: diálogo Trust Project]
+> **Qué verás:** la pantalla de bienvenida de MPS es una ventana con la lista de proyectos recientes a la izquierda y, arriba, los botones **New Project**, **Open** y **Get from VCS**. Después de elegir la carpeta aparece un cuadro titulado *Trust and Open Project?* con dos botones: **Trust Project** (el que debes pulsar) y **Don't Open**.
 
 ### 1.4 Compilar el lenguaje: Rebuild Project (obligatorio la primera vez)
 Menú **Build → Rebuild Project**. Tarda de 1 a 3 minutos. Espera a que termine.
@@ -45,7 +42,7 @@ Menú **Build → Rebuild Project**. Tarda de 1 a 3 minutos. Espera a que termin
 
 No es que el proyecto esté roto: el lenguaje simplemente no está compilado en tu computador (lo compilado no se guarda en Git). Haz **Build → Rebuild Project** y desaparecen.
 
-[captura: menú Build → Rebuild Project]
+> **Dónde está:** en la barra de menús de arriba, **Build** es uno de los menús (junto a *File*, *Edit*, *View*…); al abrirlo, **Rebuild Project** aparece entre las primeras opciones. Mientras compila verás una barra de progreso abajo a la derecha; cuando desaparece, ha terminado.
 
 ### 1.5 Diálogos que pueden aparecer
 - **"Add File to Git"** (al crear o guardar archivos): pulsa **Cancel** o **Don't Ask Again**. No hace falta añadir nada a Git para usar Domus.
@@ -62,7 +59,9 @@ No es que el proyecto esté roto: el lenguaje simplemente no está compilado en 
 - Para abrir un ejemplo: despliega la carpeta y haz **doble clic** en el elemento con la "N" (por ejemplo `CasaSegura`).
 - Arriba a la derecha del editor hay un indicador: **✓ verde** = sin errores.
 
-[captura: Logical View con domus.lang.sandbox desplegado]
+![MPS con Logical View a la izquierda y el editor a la derecha](img/antes_estilos_v3.png)
+
+*A la izquierda, Logical View con `domus.lang.sandbox` desplegado; a la derecha, el editor con el sistema `CasaInteligente` y el ✓ verde arriba a la derecha.*
 
 ---
 
@@ -74,9 +73,7 @@ No es que el proyecto esté roto: el lenguaje simplemente no está compilado en 
 4. **Crea el sistema:** clic derecho sobre tu modelo → **New → domus.lang → sistema** (aparece como *HomeSystem*). Se abre el editor con `sistema <no name>`.
 5. Haz clic en `<no name>` y escribe el nombre de tu casa, por ejemplo `MiCasa`.
 
-[captura: menú New → Model sobre domus.lang.sandbox]
-[captura: Model Properties, pestaña Used Languages con domus.lang]
-[captura: menú New → domus.lang → sistema]
+> **Qué verás:** al hacer clic derecho sobre `domus.lang.sandbox` aparece un menú largo; **New** está arriba y abre un submenú donde **Model** es una de las opciones. *Model Properties* es una ventana con pestañas (*Dependencies*, *Used Languages*, *Advanced*…); en *Used Languages* hay una lista (vacía al principio) y un botón **+** encima o a la izquierda. Tras añadirlo, la lista muestra `domus.lang`. En el menú **New** de tu modelo aparecerá luego un submenú **domus.lang** con la opción **sistema**.
 
 > Si tu modelo va a tener errores a propósito y no quieres que se genere código, en **Model Properties → Advanced** marca **Do not generate**.
 
@@ -100,6 +97,12 @@ No es que el proyecto esté roto: el lenguaje simplemente no está compilado en 
 ---
 
 ## 5. El lenguaje, pieza por pieza
+
+Así se ve un sistema completo en el editor (ejemplo `v1_cerradura`):
+
+![Ejemplo v1_cerradura en el editor](img/despues_estilos_v1.png)
+
+Las palabras clave salen en azul, los nombres de dispositivos, políticas y escenarios en negrita, y los tipos de evento y modos de política (COMMAND, SENSOR, REQUIRED, FORBIDDEN) en gris cursiva. Otro ejemplo, con tres dispositivos: ![Ejemplo v3_casa](img/despues_estilos_v3.png)
 
 ### 5.1 Sistema y roles
 ```
@@ -147,7 +150,7 @@ Cada fila dice: "si estoy en **Origen** y ocurre **Evento**, paso a **Destino**"
 - **Moverse:** **Tab** o las flechas.
 - **Borrar una fila:** clic en la fila → **Ctrl+W** hasta seleccionar la fila entera → **Delete**.
 
-[captura: tabla δ de la Cerradura (ver docs/img/tabla_delta_v1.png)]
+![Tabla δ de la Cerradura](img/tabla_delta_v1.png)
 
 ### 5.4 Políticas (reglas de seguridad)
 ```
@@ -192,7 +195,7 @@ Un escenario es una secuencia de eventos que hace una persona. Domus la **simula
 - **Info** = información útil (no es un problema).
 - Para leer un mensaje, deja el ratón quieto **sobre lo subrayado** un segundo.
 
-[captura: recuadro de mensaje al pasar el ratón sobre un error]
+> **Qué verás:** al dejar el ratón sobre lo subrayado aparece un recuadro pequeño, flotante, con el texto del mensaje (por ejemplo, el de la tabla de la sección 6.4). Además, en el margen derecho del editor hay una marca de color a la altura de cada problema, y el indicador de arriba a la derecha cambia del ✓ verde a un símbolo rojo o amarillo.
 
 ### 6.1 Errores de alcance (algo de otro sitio)
 | Mensaje | Qué significa | Cómo corregirlo |
@@ -252,8 +255,7 @@ Domus puede convertir tu sistema en un programa Java que imprime el **reporte de
    - Se usa el Java que trae MPS (`jbr`), así que no hay que instalar ni configurar Java aparte.
 5. Verás el reporte: estados inalcanzables, bloqueos, trampas, alarmas, el veredicto de cada política, la expresión regular equivalente a cada dispositivo y el resultado de cada escenario. El ejemplo completo está en `docs/GUION_DEMO.md`, paso 5.
 
-[captura: menú Generate Model]
-[captura: terminal con el reporte impreso]
+> **Qué verás:** en el clic derecho sobre el modelo, **Generate Model** aparece hacia la mitad del menú, cerca de *Make Model* y *Rebuild Model*. La terminal se abre como un panel en la parte inferior de MPS; tras pegar las líneas, el reporte se imprime ahí mismo, empezando por una línea de signos `=` y el título `REPORTE DE VERIFICACIÓN del sistema …`.
 
 ---
 
@@ -280,6 +282,10 @@ Crea un modelo nuevo (sección 3) con un sistema **`MiGaraje`** que tenga:
 4. (Opcional) Un escenario `SalidaDueno sobre Porton actor Dueno: abrir, abrir, cerrar`.
 
 **Al terminar** el indicador debe estar en ✓ verde. (Pista: si aparece un error que no esperas, léelo con la sección 6.)
+
+Si pasas el ratón por la política y por el escenario verás (comprobado construyendo el ejercicio en MPS):
+- «Info: Política verificada: AFD mínimo de 4 estados (3 útiles + sumidero)»
+- «Info: Simulación aceptada: Cerrado → Abriendo → Abierto → Cerrado»
 
 ### Hoja de observación (la rellena quien observa)
 
