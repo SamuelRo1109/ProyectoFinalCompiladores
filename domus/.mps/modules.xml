@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="MPSProject">
+    <projectModules>
+      <modulePath path="$PROJECT_DIR$/languages/domus.lang.sandbox/domus.lang.sandbox.msd" folder="" />
+      <modulePath path="$PROJECT_DIR$/languages/domus.lang/domus.lang.mpl" folder="" />
+      <modulePath path="$PROJECT_DIR$/solutions/domus.reasoner/domus.reasoner.msd" folder="" />
+      <modulePath path="$PROJECT_DIR$/solutions/domus.tests/domus.tests.msd" folder="" />
+    </projectModules>
+  </component>
+</project>

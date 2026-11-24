@@ -55,7 +55,7 @@ Luis y Gaby deben **aceptar la invitación** de colaboradores que les llega por 
 1. `File → New Project → Language Project`.
 2. **Project name:** `Domus` · **Project location:** `<ruta-del-repo>/domus`
 3. **Language namespace:** `domus.lang`
-4. Marca **Create Sandbox Solution** → `domus.sandbox`.
+4. Marca **Create Sandbox Solution** → `domus.lang.sandbox`.
 5. `OK`. Espera a que termine de indexar.
 
 ### 0.4 Git dentro de MPS
@@ -148,7 +148,7 @@ Estado inicial con "→" y de aceptación con "◎" (property cells booleanas vi
 Puedes partir de mps_mcp_scaffold_editor y luego ajustar. Reconstruye y valida.
 ```
 **Verificación humana (importante para aprender):**
-1. Clic derecho en `domus.sandbox` → `New → Model` → `validos.v1_cerradura`. En propiedades del modelo, añade el lenguaje usado `domus.lang`.
+1. Clic derecho en `domus.lang.sandbox` → `New → Model` → `validos.v1_cerradura`. En propiedades del modelo, añade el lenguaje usado `domus.lang`.
 2. Dentro, `New → domus.lang → HomeSystem` y **escribe a mano** el ejemplo de la §2 de la especificación (usa `Ctrl+Space` para completar). Esto es lo que mostrarás en el video.
 3. Anota en `docs/BITACORA.md` lo que se sintió raro del editor: es insumo para Gaby.
 
@@ -213,7 +213,7 @@ Muéstrame una tabla regla → nombre del nodo MPS creado → mensaje de error.
 
 **Prompt:**
 ```
-Según la tabla §6 de docs/02_ESPECIFICACION_FORMAL.md, crea en domus.sandbox los modelos
+Según la tabla §6 de docs/02_ESPECIFICACION_FORMAL.md, crea en domus.lang.sandbox los modelos
 validos.v2_alarma, validos.v3_casa, invalidos.i2_roles, invalidos.i3_alfabeto e
 invalidos.i4_restricciones, cada uno con un HomeSystem (usa mps_mcp_insert_root_node_from_json).
 Cada modelo usa el lenguaje domus.lang. Marca los modelos invalidos.* con "do not generate".

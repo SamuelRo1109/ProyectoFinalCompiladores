@@ -1,0 +1,237 @@
+---
+name: mps-node-editing
+description: Add, update, or delete MPS nodes using JSON blueprints — covers the unified blueprint format, staged construction for large subtrees, validation, and reference repair. Use whenever creating, editing, or restructuring nodes in any MPS model (structure, editor, behavior, generator, application code, etc.).
+type: reference
+---
+
+# MPS Node Editing
+
+## Loading companion skills
+
+Companion names in this skill are lazy dependencies: load only those relevant to the current task. If this skill came from an MCP server, use the host's skill loader to resolve the companion's unique discovered entry URI on the same host-assigned originating server. If the host has no server-backed skill loader, stop and report that limitation; do not silently fall back to a filesystem copy. If this skill came from a filesystem catalog, load the named sibling from that same catalog at `<skills-root>/<skill-name>/SKILL.md`, even if remote skill loaders are also available. Do not invent a tool name or server endpoint.
+
+The core workflow for mutating MPS nodes through MCP tools. JSON blueprints describe the node hierarchy you want; the tools resolve concepts, references, and used languages on insert.
+
+## Critical Directives
+
+- **Always use the fully qualified concept name** in the `concept` field — it is unambiguous and does not require a `conceptReference`.
+- **Resolve before editing** — call `mps_mcp_get_current_editor_root_node` (for the user's focus) or `mps_mcp_search_root_node_by_name` (by name) to lock onto the target. Don't guess refs.
+- **Prefer surgical edits** — `mps_mcp_update_node` (`ADD`/`CHILD` or `SET`/`CHILD`) preserves persistent IDs. `mps_mcp_update_root_node_from_json` rewrites the entire root and is wasteful when only one subtree changed.
+- **Don't delete-and-reinsert** to make a small change — deletion destroys persistent IDs and breaks incoming references.
+- **Cloning an existing node? Use `mps_mcp_alter_nodes` `COPY_NODE`, not a JSON blueprint.** It clones the subtree natively — correct concept, properties, refs, nested structure — as the next sibling (multi-child role) or new root, then tweak with `mps_mcp_update_node`. Reserve JSON blueprints for nodes with no close match to copy from.
+- **Choosing a replacement or filling a typed slot?** Ask `mps_mcp_query_nodes` `GET_EXPECTED_TYPE` on the node you are about to replace, then confirm a candidate with `mps_mcp_query_types` `IS_SUBTYPE` before inserting. An empty slot has no answer, and the bound can depend on the node already there (`byte b = 1`, `return 'c'`); `null` means no usable upper/comparable bound, not “anything goes.” See `mps-mcp-workflow/references/analysis-tools/type-queries.md` for details.
+- **Validate frequently** — call `mps_mcp_check_root_node_problems` immediately after inserting or modifying a complex node. `"ok": true` from insert does not mean the AST is semantically valid; read `warnings` and `details.uncheckedSubtrees`, and open a problem's `rules[].statement` to see which rule reported it.
+- **Generate deep blueprints, do not hand-nest them** — if you write a blueprint as JSON rather than through `mps_mcp_parse_java_and_insert`, and it holds a BaseLanguage body or nests more than ~5 node levels, generate it with `scripts/blueprint.py` and pass the printed temp-file path. A hand-written one ends in a long run of `]}` pairs; one pair too few is rejected as `INVALID_JSON … unbalanced`, or, when it is missing mid-input, puts a later role under the wrong node. Plain Java still goes through the parser first (`mps-baselanguage`).
+- **A blueprint is not the whole node** — the concept's node factory runs first and may add properties, children, and references your JSON never mentions. Do not re-do its work by hand, and do not assume an inserted node contains exactly what you wrote. See "Node factories" below.
+
+## `mps_mcp_update_node` — Unified Node-Mutation Tool
+
+All child, property, and reference operations on existing nodes go through `mps_mcp_update_node`. The operation is selected via `operation` (`ADD`/`SET`) × `kind` (`CHILD`/`PROPERTY`/`REFERENCE`). **There is no `DELETE` operation** — deletion is a `SET`: omit `childJson` to delete a child, or pass an explicit `null` as a triplet's value to clear a property or reference. A *shortened* triplet is rejected (`Invalid property triplet: expected at least 3 elements`, and the `reference` equivalent), so the null has to be written out. To delete a whole **root**, call `mps_mcp_update_root_node_from_json` with `operation: "DELETE"` and the root's `nodeReference` (no blueprint needed).
+
+| operation × kind        | Required parameters                                           | Notes |
+|-------------------------|---------------------------------------------------------------|-------|
+| `ADD` × `CHILD`         | `nodeReference` (parent), `childRole`, `childJson`            | Optional `position` (0-based; null/-1 = append) and `dryRun`. A `position` ≥ the current child count clamps to an append; a negative value other than -1 is rejected. The response's `data.index` reports the actual landing index. |
+| `SET` × `CHILD`         | `childNodeRef` (+ `childJson` to replace)                     | Replaces an existing child; preserves its position in the role. Optional `dryRun`. The success envelope is the parent's (`data.reference`), not the new child's, for both a replacement and a deletion; the replaced child's reference is stale. **Omit `childJson` to delete the child** — `mps_mcp_update_node` offers no other way to delete one (a whole-root rewrite via `mps_mcp_update_root_node_from_json` can also drop children). |
+| `SET` × `PROPERTY`      | `properties` = `[[nodeRef, propertyName, value], …]`          | Batch operation; returns per-row results. A row whose `value` is an explicit `null` deletes that property; a two-element row is rejected, not treated as a delete. |
+| `SET` × `REFERENCE`     | `references` = `[[nodeRef, role, targetRefOrName], …]`        | Batch operation; `targetRefOrName` accepts an `r:...` ref or a plain name. A plain name is resolved within the reference role's search scope; if it cannot be resolved the call fails (`NOT_FOUND`), preserves the previous reference value, and stores no dangling reference. A row whose `targetRefOrName` is an explicit `null` deletes that reference; a two-element row is rejected, not treated as a delete. |
+
+`ADD` × `PROPERTY` and `ADD` × `REFERENCE` are not valid combinations and return an error envelope. So does any other `operation` value, `DELETE` included.
+
+`mps_mcp_update_node` (PROPERTY / REFERENCE / CHILD) and `mps_mcp_alter_nodes` MOVE_CHILD / MOVE_NODE_TO_PARENT / COPY_NODE also work on nodes inside the **current MPS Console input command** — pass the node's normal persistent reference; no extra parameter is needed. The node must be inside the current unexecuted console input (not history/stale). MOVE_NODE_TO_PARENT only relocates a node *within* the current console command — moving a node between the console and a project model, or making a console node a root, is refused. Edits to console nodes skip disk-persistence and refresh the console's imports instead. Nodes outside the selected project are rejected as before. For the console model itself (its imports and used languages), `mps_mcp_model_dependency` and `mps_mcp_model_used_language` take `modelReference: "console"`.
+
+For `MOVE_CHILD`, supply `childNodeRef` (or a lone `nodeReference`) for the child to move and `position` (`0`-based, or `-1` for the end); `nodeReference` (the parent, when `childNodeRef` is also passed) and `childRole` are inferred from the child when omitted and validated when supplied. Whatever was inferred is reported in the response's `details` (`movedNode`, `parentReference`, `childRole`, `inferredParameters`), and a lone `nodeReference` read as the child adds a `warnings` entry saying so. A lone `nodeReference` together with a `childRole` that the node's own concept also declares is rejected as ambiguous: pass `childNodeRef` to say which node moves. For project models, `MOVE_NODE_TO_PARENT` has two intentional forms. Supply a non-null `newParentRef` and `role` to reparent the node. To promote it to a root, omit `newParentRef` and supply `modelReference`. Do not send `"newParentRef": null`: explicit null is rejected so it cannot accidentally select the promotion form, and passing both `newParentRef` and `modelReference` is rejected too. The promotion form needs a rootable concept and ignores `role`/`position` with a warning. All checks run before the model changes, so a rejected move leaves the node where it was: a new parent that is the node itself or one of its descendants, a node whose concept the role does not accept (the error carries wrapper hints), and an unknown `role` (the error lists the roles that fit in `details.candidateRoles`). A single-valued role (`[0..1]`/`[1]`) that already holds another node is **rejected** here, unlike `mps_mcp_update_node` ADD CHILD, which replaces the occupant; such a role takes only `position` `-1` or `0`. `details` reports `movedNode`, `previousParentReference` (or `previousModelReference` for a former root), and `parentReference` plus `role`, or `modelReference`; emptying a required `[1]` role of the old parent adds a warning. A move to another model keeps the references *within* and *out of* the moved subtree resolvable (references between its own nodes follow them to the new model; references out of it get model imports and module dependencies; reported in `data.fixReferences`) and imports the used languages of the subtree's nodes that the target model lacks and no DevKit provides (listed in `details.addedUsedLanguages`), but incoming usages are **not** updated: any references to the moved nodes from other models, including the node's previous model, stop resolving, and a `warnings` entry says so. Use MPS's Move refactoring in the IDE for a full move.
+
+`childJson` accepts the blueprint as real JSON, as that JSON written as a string (max 4 KB), **or** as an absolute path to a TEMPORARY file (inside the system temp directory) containing it. Over 4 KB, use the file form to avoid MCP-transport truncation.
+
+Where a documented null means something, how you express it depends on where it sits. For `SET` × `CHILD`, the null is the `childJson` *parameter*: express it by **omitting the parameter** or sending an unquoted JSON null. For `SET` × `PROPERTY`/`REFERENCE` the null is the third *element* of a triplet, so it must be written out as an unquoted JSON null — omitting the `properties`/`references` parameter is rejected as missing, and a two-element row is rejected as a malformed triplet, not read as a delete. In neither case is the 4-character string `"null"` the null form — for `childJson` it is rejected as `Input is the string 'null', not a JSON object/array or a file path`.
+
+## Prerequisites
+
+- Load the `mps-language-analysis` skill if you do not yet know what concepts the model uses.
+- For type questions, use `mps-mcp-workflow/references/analysis-tools/type-queries.md`; do not simulate the typesystem by reading rule roots.
+- Resolve the target node (unless creating a brand-new root):
+    - `mps_mcp_get_current_editor_root_node` for the user's focus.
+    - `mps_mcp_search_root_node_by_name` for a known name.
+- Resolve required languages and concepts:
+    - Check used languages of the current model via `mps_mcp_get_project_structure`.
+    - Get concept details using `mps_mcp_get_concept_details` for specific languages.
+    - Use `mps_mcp_search_concepts` for discovery.
+
+## Common Workflow
+
+1. **Identify** the target node (existing) or parent model (new root).
+2. **Choose the right tool**: `mps_mcp_create_root_node` / `mps_mcp_insert_root_node_from_json` for new roots; `mps_mcp_update_node` (`ADD`/`SET` × `CHILD`/`PROPERTY`/`REFERENCE`) for surgical edits; `mps_mcp_update_root_node_from_json` only for full-root rewrites.
+3. **Author the JSON** following the unified blueprint format. A BaseLanguage body or anything deeper than ~5 node levels: build it with `scripts/blueprint.py` (see "Scripts") instead of typing it inline.
+4. **Insert.** A `dryRun: true` call checks concepts, roles, properties and assignability, but it never looks up a reference target given by name: it warns "is a name, not looked up" for every one, including names that exist. Do not rewrite names or dry-run again because of those warnings. Fix only the "names no node" and "matches no Model.Root" warnings, and after the real write check `fixReferences.stillBroken`. The full rule is under "Dry-run response" in `references/reference-formats/response-envelope.md` in the `mps-mcp-workflow` skill root after loading that companion skill from the same origin.
+5. **Validate** with `mps_mcp_check_root_node_problems`, reading `warnings` and `details.uncheckedSubtrees` as well as `data`: a clean verdict over commented-out or other skipped subtrees proves nothing. Problems may carry `rules: [{rule, ruleReference, statement}]`; open the reporting statement rather than guessing. Problems may also carry a `quickFixes` array; apply one with `mps_mcp_apply_intention`, or pass `autoApplyQuickFixes=true` for one-shot repair of the auto-applicable ones.
+6. **Repair** broken refs with `mps_mcp_alter_nodes FIX_REFERENCES` if validation surfaces resolvable-but-unresolved targets.
+
+## Related Skills
+
+- **`mps-aspect-structure-concepts`** — defines what concepts exist and what roles they expose.
+- **`mps-aspect-actions`** — node factories: what a concept initializes on creation, before your blueprint is applied.
+- **`mps-baselanguage`** — when the nodes you edit are BaseLanguage / Java.
+- **`mps-quotations`** — embedding inline node literals inside model code.
+- **`mps-language-analysis`** — exploring an unfamiliar language before editing.
+- **`mps-model-manipulation`** — when the edit also requires navigating the tree from model code (`.ancestor<C>`, `.descendants<C>`, siblings, containingRoot); open only `references/dot-expression-basics.md` in the `mps-model-manipulation` skill root after loading that companion skill from the same origin.
+
+## JSON Input — File-Path Semantics
+
+The tools that accept a node JSON blueprint (`mps_mcp_update_node` for `ADD`/`SET` × `CHILD`, `mps_mcp_insert_root_node_from_json`, `mps_mcp_update_root_node_from_json`) all use the same `childJson` / `json` parameter convention:
+
+- The parameter can be **either** the JSON itself (max 4 KB) — sent as real JSON or as that JSON written as a string, both equivalent — **or** an absolute path to a TEMPORARY file (inside the system temp directory) containing it; see `references/json-format.md` for the accepted directories.
+- `mps_mcp_insert_root_node_from_json` and `mps_mcp_update_root_node_from_json` additionally accept a **top-level array** for a bulk insert, which `mps_mcp_update_node`'s `childJson` does not — it takes a single object (or a file path).
+- Files may contain either a **raw node blueprint** or the **full MCP response envelope** produced by `mps_mcp_print_node`; in the latter case the `data` field is used.
+- **Ordinary input files are never deleted.** Only temporary JSON files created by this toolset may be cleaned up after reading (and only when `dryRun=false`).
+- Very large JSON inputs may be truncated by the MCP transport before the tool reads them. If that happens, insert a smaller blueprint first and add children in follow-up calls with `mps_mcp_update_node` (`ADD`/`CHILD` or `SET`/`CHILD`), or pass the JSON as a file path instead of an inline string. See `references/staged-construction.md` for the recommended pattern.
+
+## Node factories
+
+Many concepts ship a **node factory** (the language's `actions` aspect) that initializes a freshly
+created node. It fires *before* your blueprint is applied, and it may set properties, add children,
+wire references, and reach outside the node entirely: add a used language or model import, add a
+module dependency, or bump the language's version. Factories are inherited, so a concept gets the
+factories of its super-concepts **and** its implemented interfaces.
+
+A factory runs for every node that is newly **created**, and not for a node that already exists:
+
+| Tool | Factory runs for |
+|---|---|
+| the editor, `mps_mcp_create_root_node` | the new node |
+| `mps_mcp_insert_root_node_from_json` | each new root and every nested blueprint child |
+| `mps_mcp_update_node` `ADD` × `CHILD`, `SET` × `CHILD` with a `childJson` | the new child and its nested children |
+| `mps_mcp_insert_console_command_from_json` | the new command node and its children |
+| `mps_mcp_update_root_node_from_json` | **only the staged children** — the root itself already exists, so nothing runs for it |
+| `mps_mcp_update_node` `SET` × `CHILD` with no `childJson` (a delete) | nothing |
+
+How a blueprint composes with the factory:
+
+| Blueprint says | Result |
+|---|---|
+| nothing about a property | the factory's value stands |
+| a property the factory also set | **your value wins** (properties are applied after the factory) |
+| nothing about a child role | the factory's children in that role stand |
+| a child role | that role is **cleared first**, then filled from your blueprint |
+| nothing about a reference role | the factory's target stands |
+| a reference role | **your target wins** |
+
+Practical consequences:
+
+- **Do not hand-write what the factory already does.** Duplicating a factory side effect is how
+  double-counting bugs appear — e.g. a `MigrationScript`'s or `PureMigrationScript`'s
+  language-version bump (see the `mps-aspect-migrations` skill).
+- **Name a role only to override it.** Listing a role you meant to leave alone silently discards
+  the factory's contribution to it.
+- **Mandatory roles are not auto-filled.** The blueprint paths deliberately skip MPS's
+  "create default child for every 1-cardinality role" step, so a role you omit stays empty and
+  `mps_mcp_check_root_node_problems` will report it. That is intentional: the blueprint stays exact.
+- **`dryRun: true` does not run factories at all** — their side effects land on the model and module
+  and nothing rolls them back. A dry run therefore validates the blueprint, not the final node.
+- **Factory side effects survive a failed call.** They are applied while the blueprint is being
+  built, and a failed call removes only the nodes it created, never what the factories wrote
+  elsewhere. If a batch insert fails on its third root, the first two roots are not inserted but
+  whatever their factories wrote to the model and module — imports, module dependencies, a
+  language-version bump — stays. Re-read the affected state instead of assuming a failed call
+  changed nothing. A stray language-version bump is undone in one call:
+  `mps_mcp_update_module(operation="SYNC_VERSION")` re-derives the version from the scripts that
+  actually exist.
+- **A factory that *throws* is reported; one that swallows its own exception is not.** A throw
+  becomes a `warnings` entry naming the concept, and the node is still created — treat its
+  factory-initialized state as absent. But a factory that catches internally reports nothing and
+  the envelope looks clean. That is the norm for `AutoInitDSLClass` concepts (`MigrationScript`
+  among them), whose initializer runs behind its own `catch` and surfaces only in `idea.log`. For
+  those, verify the state the factory was supposed to set rather than trusting `ok: true`. To
+  find and read that log, see `references/ide-log.md` in the `mps-mcp-workflow` skill root after loading that companion skill from the same origin.
+
+To see whether a concept has a factory at all, use
+`mps_mcp_query_structure(operation = "LIST_CONCEPT_ASPECTS", …)` — it reports which aspect models
+declare something for the concept, including `actions`. Read `relation` first: only `appliesTo`
+roots act on the concept; `mentions` roots merely quote it, and `pattern` means the match could not
+be resolved structurally. `targetsConcept` alone includes both applying and mentioning roots.
+(`mps_mcp_get_concept_details` does **not** list aspects.) The `mps-aspect-actions` skill covers
+authoring and reading factories.
+
+## Reference Index
+
+- Open `references/json-format.md` when you need the unified JSON blueprint shape — concept/properties/children/references layout, optional-section rules, and reference-resolution semantics (`r:...` vs name auto-resolution).
+- Open `references/staged-construction.md` when the subtree is large (>~4 KB) or its child refs are needed for later edits — the skeleton → validate → incremental-fill → targeted-update → cleanup pattern.
+- A blueprint that holds a BaseLanguage body, nests more than ~5 node levels or exceeds ~4 KB is generated with `scripts/blueprint.py` (see "Scripts") and passed as the temp-file path it prints: hand-counted closing brackets in deep inline JSON are the usual cause of `INVALID_JSON` parse errors.
+- Open `references/troubleshooting.md` when any tool rejects a JSON input (a blueprint, `conceptsJson`, `interfaceConceptsJson`, `valuesJson`, a `parameters` object, `settingsJson`) with `INVALID_JSON` / gson parse errors (`unbalanced`, `unterminated string`, `unexpected content`), with `JsonElement.getAsString()` errors, or when the JSON shape diverges from the user's textual notation.
+
+## Scripts
+
+`scripts/blueprint.py` — builds a deep blueprint from nested `node(...)` calls, so no closing
+bracket is typed by hand, and writes it to a file under the system temp directory. Pass the
+Python on stdin with `-` as the only argument; `node` and `emit` are predefined:
+
+```
+python3 .claude/skills/mps-node-editing/scripts/blueprint.py - <<'EOF'
+BL = "jetbrains.mps.baseLanguage.structure."
+cond = node(BL + "GreaterThanOrEqualsExpression", children={
+    "leftExpression": node("jetbrains.mps.lang.constraints.structure.ConstraintsFunctionParameter_propertyValue"),
+    "rightExpression": node(BL + "IntegerConstant", props={"value": 1})})
+emit(node(BL + "StatementList", children={"statement": [
+    node(BL + "ExpressionStatement", children={"expression": cond})]}), single=True)
+EOF
+{"bytes":600,"depth":4,"nodes":5,"path":"/var/folders/.../T/bp-k1ddjf3n.json"}
+```
+
+`node(concept, props={name: value}, refs={role: target}, children={role: node or [nodes]})`
+returns the node, so a subtree can be bound to a variable and composed into a larger one, as
+`cond` is above. A bool property value becomes `"true"`/`"false"`, a number its text, and
+`None` leaves the property out. `emit(blueprint, stem="bp", single=False)` checks that every
+node has a fully qualified concept, writes the file, and prints `{bytes, depth, nodes, path}`;
+`blueprint` may be a list for a top-level array. Pass `single=True` for
+`mps_mcp_update_node` `childJson` and `mps_mcp_update_root_node_from_json` `json`, which take
+one object. Hand the printed path to the tool. A bad blueprint exits 3 with the JSON path of
+the node at fault (`$.statement[0].expression[0]: concept 'IntegerConstant' is not fully
+qualified`); a run without `-` exits 2 and never waits for input. The script checks the shape
+only; a dry run of the tool checks roles and properties. Adjust the path prefix if your skills
+are installed elsewhere than `.claude/skills`.
+
+`scripts/table_to_bulk_insert.py` — turns a CSV (or JSON rows) plus a small JSON mapping spec
+into the top-level-array blueprint `mps_mcp_insert_root_node_from_json` accepts, written to a
+file under the system temp directory, and prints `{path, roots, children, references}`. Covers
+typed properties (`int`, enum literals), split-column child lists, and reference-wrapper
+children whose targets are written as names for the tool to resolve after the batch lands.
+A cookbook-style root that references every row is the spec's `aggregate` key: the script
+appends it to the same batch (`roots` then counts it, and `aggregateReferences` is printed), and
+the same `--verify` checks it, so there is no second insert and no separate check to write.
+
+```
+python3 scripts/table_to_bulk_insert.py courses.csv courses.map.json
+{"children":183,"path":"/var/folders/.../bulk_insert-courses-1234.json","references":65,"roots":40}
+```
+
+Then `mps_mcp_insert_root_node_from_json(modelReference=…, json="<that path>")` and read
+`fixReferences.stillBroken` in its response. Skip the `dryRun=true` call, or ignore its "is a
+name, not looked up" warnings: a dry run never looks up name targets, whether the table defines
+them or they already exist, and the real insert resolves them.
+
+To check the inserted model against the table, dump it once and run the same script with
+`--verify`. That replaces a hand-written comparison script:
+
+```
+mps_mcp_get_project_structure(startingPoint=<model>, includeNodes=true, nodeDepth=1)
+python3 scripts/table_to_bulk_insert.py courses.csv courses.map.json --verify <dumpFile>
+row 7 (Conducting): lessons[2].minutes: expected '10', got '12'
+{"differences":1,"extraRoots":0,"matched":39,"mismatched":1,"missing":0,"rows":40}
+```
+
+It pairs rows with roots by the spec's `nameColumn`, and compares every property, child and
+reference target the spec produces. It exits 0 when every row matches and 1 on any
+difference. With an `aggregate`, that includes the aggregate root's wrapper count and each
+wrapper's target.
+
+Run `--help` for the full mapping-spec reference, `--list-tools` for the tools and parameters
+it depends on; `scripts/examples/` holds a 40-row `courses.csv` with its matching
+`courses.map.json`. This usage block plus `--help` are the contract: there is no need to read
+the script source or the examples first.
+
+No `python3` (typically Windows): author the array by hand as described in
+`references/json-format.md` — one object per row, `properties` entries omitted for empty cells
+so the MPS default applies, one child role per list column, and one wrapper child per
+reference with `{"role": …, "target": "<name>"}` (an aggregate root goes last, one such
+wrapper per row) — write it to a file under `$TMPDIR`
+(or `/tmp` on macOS) and pass that path. Prefer `--limit`-sized batches, or the
+staged construction in `references/staged-construction.md`, over one oversized blueprint.

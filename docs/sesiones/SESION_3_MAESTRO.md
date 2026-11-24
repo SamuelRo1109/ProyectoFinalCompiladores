@@ -18,13 +18,15 @@
 ## FASE 0 — Preparación y revisión del PR S2
 
 1. Instala **la misma build de MPS** de `README.md`, Claude Code, Git y `gh`. Acepta la invitación al repo.
-2. `git clone <repo> && cd domus-dsl-mps && gh pr checkout <número-del-PR-S2>`
+2. `git clone <repo> && cd ProyectoFinalCompiladores && gh pr checkout <número-del-PR-S2>`
 3. Abre `domus/` en MPS → `Ctrl+Shift+A` → **Install MPS VCS Add-ons**.
-4. `Settings → Tools → MCP Server`: puerto y solo herramientas `mps_mcp_*` expuestas. `claude` en la raíz → `/mcp`.
+4. `Settings → Tools → MCP Server`: puerto y solo herramientas `mps_mcp_*` expuestas (sin router-only). `claude` en la raíz → `/mcp`. **En Windows**, si `/mcp` falla con `InvalidHTTPResponse`, registra el servidor por SSE: `claude mcp add --transport sse mps http://127.0.0.1:64342/sse --header "IJ_MCP_SERVER_PROJECT_PATH: <ruta>/domus" --scope local` (ver `CLAUDE.md`).
 5. **Revisa el PR S2 como usuaria** (no solo como técnica):
-   - [ ] `Rebuild Project` sin errores; `domus.tests → Run tests` todo en verde.
+   - [ ] `Rebuild Project` sin errores; `domus.tests → Run tests` todo en verde (60 pruebas). Si aparece `UnsupportedClassVersionError` (class file 65), en *Edit Configurations* usa como JRE `C:\Program Files\JetBrains\MPS 2026.2\jbr`.
+   - [ ] Conteos esperados al validar `domus.lang.sandbox`: v1–v3 = 0 errores; i1 = 5 (3 de alcance + 2 deadlocks reales), i2 = 1 (+1 warning), i3 = 1, i4 = 5.
    - [ ] En `validos.v1_cerradura`: rompe algo (borra una transición) y mira si el mensaje del razonador se entiende sin saber teoría. Anota cada mensaje confuso.
-   - [ ] Genera `v1` y ejecuta el `main`: ¿la salida se entiende?
+   - [ ] Genera `v1` y ejecuta el `main` (mismo JRE que arriba): ¿la salida se entiende?
+   - [ ] Lee en `HANDOFF_S2.md` §5 la decisión sobre la política `SesionCompleta` de v2 (tomada en S2 sin consulta) y confírmala o pide revertirla.
    - Aprueba (`gh pr review --approve`) o pide cambios. Merge. Luego:
 ```bash
 git checkout develop && git pull
@@ -52,7 +54,7 @@ Si el lenguaje de tablas exige un TableModel en BaseLanguage, impleméntalo y ex
 **Verificación:** agregar, editar y borrar transiciones **solo con teclado**.
 **Commit:** `feat(editor): tabla δ de transiciones`
 
-> Si el Hito 2 aún no se ha entregado: haz el release del Hito 2 ahora (ver Fase 9, con `release/hito-2` y tag `v0.2-hito2`).
+> No hay release del Hito 2 por separado: S1 y S2 se entregan juntas, y el único release es el del Hito 3 (Fase 9). La tabla δ (A5) es la tarea P0 pendiente heredada de S2.
 
 ---
 
@@ -123,7 +125,7 @@ agregar una fila a la tabla δ y la intention "Crear vista de verificación". Ej
 
 **Prompt:**
 ```
-Crea el modelo domus.sandbox demo.caso_en_vivo con un HomeSystem pequeño (2 dispositivos)
+Crea el modelo domus.lang.sandbox demo.caso_en_vivo con un HomeSystem pequeño (2 dispositivos)
 y escribe docs/GUION_DEMO.md: guion de 5 minutos para mostrar en vivo, paso a paso,
 (1) escribir un dispositivo con la tabla δ, (2) un error de alcance y uno de tipos atrapados,
 (3) el razonador detectando un deadlock y una política violada con contraejemplo,

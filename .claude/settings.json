@@ -17,13 +17,9 @@
     ],
     "deny": [
       "Edit(**/*.mps)",
-      "Write(**/*.mps)",
       "Edit(**/*.mpl)",
-      "Write(**/*.mpl)",
       "Edit(**/*.msd)",
-      "Write(**/*.msd)",
       "Edit(**/*.devkit)",
-      "Write(**/*.devkit)",
       "Bash(git push --force:*)",
       "Bash(git push -f:*)"
     ]

@@ -1,0 +1,53 @@
+# Bulk Node Creation and Staged Construction
+
+## Bulk Insert (Top-Level Array)
+
+- To insert multiple root nodes in one call, pass a **top-level JSON array** to `mps_mcp_insert_root_node_from_json`. All nodes are inserted atomically — if any node fails, the entire batch is rolled back.
+- Identify the existing nodes that will be referred to by the nodes to be created.
+- Include the IDs of these nodes in the JSON blueprint wherever they fit the role of target nodes.
+- For nodes that are created as part of the same bulk operation, you can use their **name** as a placeholder in the `target` field. The tool will automatically resolve these "local" references once all nodes are created.
+- If automatic resolution is not possible or desired, leave the target references empty and set them later with `mps_mcp_update_node` (`SET`/`REFERENCE`) once you have discovered the IDs of the newly created nodes.
+- **A `dryRun: true` call never looks up names.** It warns "target '<name>' is a name, not looked up" once for every name target, whether it belongs to the same batch or already exists, and the real insert then resolves them. Those warnings are expected, not errors. For a batch whose references are given by name, skip the dry run and read `fixReferences.stillBroken` after the real insert (rule: `references/reference-formats/response-envelope.md` ("Dry-run response")).
+
+### From a table (CSV or JSON rows)
+
+When the roots come from a table (one root per row, columns for properties, list columns for children or references), do not write your own converter. Load the `mps-node-editing` companion skill from the same origin and run its `scripts/table_to_bulk_insert.py`. It turns the table and a small JSON mapping spec into the top-level array, written to a file under the system temp directory. After the insert, the same script with `--verify <dumpFile>` compares a `mps_mcp_get_project_structure(startingPoint=<model>, includeNodes=true, nodeDepth=1)` dump against the table, row by row. A root that references every row (a cookbook over all recipes) is the spec's `aggregate` key, emitted in the same batch and covered by `--verify`. Its usage block in that skill's `SKILL.md` (section "Scripts") is the contract.
+
+From 10 roots up, a bulk insert answers with the summary `{inserted: N, roots: [{name, reference, concept}], fixReferences: {fixed, repointed, stillBroken}}` instead of one full node envelope per root (the full form used to be larger than the blueprint it answered); check `fixReferences.stillBroken` for unresolved references and pass `responseDetail="full"` only when the per-root `conceptDoc`/model/module fields are actually needed.
+
+After a bulk insert, validate with one `mps_mcp_check_root_node_problems` on the **model** reference (optionally `perRoot=true`, where rows with warnings or errors already carry their `messages` texts, so no follow-up single-root check is needed to read them or find their nodes) instead of one call per inserted root — the model scope checks every root and reports `details.rootsChecked`.
+
+### Array vs. object — the one asymmetry
+
+- `mps_mcp_insert_root_node_from_json` (`json`) accepts **a single object or a top-level array**.
+- `mps_mcp_update_node` (`childJson`, `ADD`/`SET` × `CHILD`) accepts **a single object only**. A top-level array is rejected with `Expected JsonObject but was JsonArray`.
+- To add N children to an existing parent: call `ADD`/`CHILD` N times, or — when the parent is being created anyway — put all N inside the parent blueprint's `children[].nodes` array and insert the parent once.
+
+## Print-Shallow-Then-Add-Children Workflow
+
+Prefer **staged construction** over one giant blueprint when a subtree is large or its child node refs are needed for later edits. Single JSON blueprints over ~4 KB get truncated, and very deep trees are hard to debug.
+
+The pattern is:
+
+1. Insert (or create) the **outer node** with a minimal blueprint — concept, properties, and just enough children/references to make the node valid.
+2. Call `mps_mcp_print_node` with `deep=false` (shallow) on the outer node to learn the **persistent refs** of its direct children and roles.
+3. Fill or extend each child role with `mps_mcp_update_node`: `ADD`/`CHILD` (append a new child in a role) or `SET`/`CHILD` (swap an existing placeholder child for a real subtree).
+4. Repeat the print-shallow step on any newly inserted child to drill further down — every staged call returns its own node ref.
+
+Use this pattern whenever you would otherwise paste a node ref you have not yet seen, when the subtree might exceed the JSON size limit, or when intermediate validation (`mps_mcp_check_root_node_problems`) between layers helps localise errors.
+
+## File inputs must live in the system temp directory
+
+Every parameter that accepts *either* inline JSON *or* a path (`childJson`, `json`, `conceptsJson`, …) resolves the path against the **JVM system temp directory** (`java.io.tmpdir`) and rejects anything outside it:
+
+```
+Input file path '/Users/me/blueprint.json' is not inside the system temp directory.
+```
+
+- macOS/Linux: write under `$TMPDIR` (on macOS a per-user `/var/folders/...` directory). On macOS, `/tmp` and `/private/tmp` are also accepted.
+- Windows: write under `%TEMP%`.
+- A leading `$TMPDIR`, `${TMPDIR}`, or `%TEMP%` in the path is expanded by the server.
+- Shell: `f="$TMPDIR/blueprint-$$.json"; cat > "$f" <<'JSON' … JSON` then pass `$f` (or the unexpanded `$TMPDIR/...` form).
+- Writing the file with an agent file-writing tool (e.g. `Write`) works too — write under `$TMPDIR`, or `/tmp` on macOS.
+- The path must be absolute; files this toolset created itself may be deleted after reading, ordinary input files are never deleted.
+
