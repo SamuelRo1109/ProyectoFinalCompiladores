@@ -116,3 +116,16 @@ Por eso un deadlock (que según §4.2 también está en `Reach \ CoReach`) solo 
   - No se ejecuta desde MPS porque el módulo `domus.lang.sandbox` tiene la compilación en MPS desactivada (`compile="off"`).
   - El ensayo de la terminal se hizo con Git Bash; los comandos del guion son su equivalente en PowerShell.
 - **Pendiente para Erika:** probar una vez los gestos marcados con ⚠️ en el guion (Enter para añadir evento, coma para añadir estado, Ctrl+V de una fila entre tablas). No se pueden ensayar por MCP.
+
+### Fase 7 — Guía de usuario (23-nov-2026)
+- **`docs/GUIA_USUARIO.md`** para quien nunca usó MPS (prueba de usuario D1 e instalación de Erika). Contenido:
+  - **Instalación:** MPS 2026.2 build 262.11879.701 y Git; clonar; abrir `domus/`; Trust Project; **Rebuild Project obligatorio** con el síntoma si se olvida («Concept … was not found»); cerrar diálogos como "Add File to Git".
+  - **Crear un modelo** en la sandbox con `domus.lang` como used language.
+  - **Atajos:** Ctrl+Espacio, Alt+Enter, Ctrl+Shift+T, Ctrl+Z, Ctrl+W, Enter en listas y tabla δ, Alt+2.
+  - **Cada construcción con un ejemplo:** sistema, roles, dispositivo, eventos, estados →/◎/alarma, tabla δ, políticas con tabla de operadores, escenarios.
+  - **Cómo leer los mensajes:** alcance, tipos, reglas y razonador, con los **textos literales** del código del lenguaje y del razonador y cómo corregir cada uno.
+  - **Generar y ejecutar el Java** con el JBR de MPS.
+  - **Ejercicio D1** (`MiGaraje` / `Porton`, ≈20 min) con hoja de observación.
+- **README:** sección "Inicio rápido" (7 pasos) con enlaces a la guía y al guion de la demo.
+- **Marcadores [captura: …]:** 11, a completar con pantallazos antes de la prueba D1.
+- **Concepto:** la guía traduce cada error a lenguaje cotidiano, como pedía la convención del proyecto: mensajes entendibles sin saber teoría y que nombran el elemento afectado.
