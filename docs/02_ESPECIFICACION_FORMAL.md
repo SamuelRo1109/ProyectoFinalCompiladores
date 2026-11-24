@@ -82,7 +82,7 @@ Cumple: ≥ 10–15 conceptos de dominio, herencia (`AlarmState`, jerarquía `Re
 ## 2. Sintaxis concreta (Editor)
 
 - Proyección textual por defecto con palabras clave en español (ver ejemplo).
-- **Proyección no textual obligatoria**: dentro de `Device`, las transiciones se proyectan como **tabla δ** (`jetbrains.mps.lang.editor.table`): columnas `Origen | Evento | Destino`.
+- **Proyección no textual obligatoria**: dentro de `Device`, las transiciones se proyectan como **tabla δ**: columnas `Origen | Evento | Destino`. Se implementa como **rejilla** con el estilo `table-component` de `jetbrains.mps.lang.editor` (encabezado en negrita, bordes por celda, ancho fijo por columna), no con `jetbrains.mps.lang.editor.table`: ese lenguaje exige un **nodo por casilla** y `Transition` guarda `source`/`event`/`target` como **referencias**, así que usarlo obligaría a cambiar la estructura y migrar todos los modelos. La guía del curso acepta "bloques o matriz" como proyección no textual.
 - Expresiones regulares en notación infija; los paréntesis son un nodo (`ParenExpr`) — **no hay ambigüedad posible porque el usuario edita el árbol, no texto** (edición proyectiva). La precedencia solo afecta la presentación.
 - Estado inicial con `→`, estado de aceptación con `◎`, alarma en rojo.
 

@@ -11,7 +11,7 @@
 | A2 | Uso de herencia (`extends`) | `AlarmState extends State`; jerarquía `RegexExpr` | S1 | `AlarmState`, `BinaryRegexExpr`/`UnaryRegexExpr` en `domus.lang.structure`; captura pendiente | ✅ |
 | A3 | Interfaces de concepto | `IDeviceElement` (+ `INamedConcept`) | S1 | `IDeviceElement` (con `getDevice()` en behavior); captura pendiente | ✅ |
 | A4 | Relaciones de composición/referencia | Hijos de `Device`; refs de `Transition` | S1 | Hijos de `Device` y refs de `Transition` (`source`, `target`, `event`) en `domus.lang.structure` | ✅ |
-| A5 | Al menos una proyección no textual (`jetbrains.mps.lang.editor.table`, bloques o matriz) | Tabla δ de transiciones en el editor de `Device` | S3 (o S2 si vence el Hito 2) | Captura de la tabla en la Sandbox | ⬜ |
+| A5 | Al menos una proyección no textual (`jetbrains.mps.lang.editor.table`, bloques o matriz) | Tabla δ de transiciones en el editor de `Device` (rejilla `table-component`; ver §2 de la especificación) | S3 | `Device_Editor` y `Transition_Editor` (+ clase `TablaDelta`) en `domus.lang.editor`; captura `docs/img/tabla_delta_v1.png`; agregar/editar/borrar filas verificado con teclado | ✅ |
 
 ## Pilar B — Semántica estática
 
@@ -41,7 +41,7 @@
 | ID | Requisito | Sesión | Evidencia | Estado |
 |---|---|---|---|---|
 | H2-1 | Repo Git con proyecto MPS funcional | S1 | Rama `feature/s1-estructura-semantica` + PR S1; tag `v0.2-hito2` pendiente | 🟨 |
-| H2-2 | Structure, Editor, Constraints, Typesystem completos | S1 (+ tabla S3) | Structure, Editor, Constraints y Typesystem hechos; tabla δ queda para S3 | 🟨 |
+| H2-2 | Structure, Editor, Constraints, Typesystem completos | S1 (+ tabla S3) | Structure, Editor (con tabla δ, S3), Constraints y Typesystem completos | ✅ |
 | H2-3 | ≥ 3 modelos válidos en la Sandbox | S1 | `domus.lang.sandbox.validos.v1_cerradura`, `v2_alarma`, `v3_casa`: 0 errores | ✅ |
 | H2-4 | ≥ 3 modelos inválidos que muestren errores de contexto y tipos | S1 | `domus.lang.sandbox.invalidos.i1_alcance`..`i4_restricciones`: i1 = 3 errores de alcance + 1 warning (inalcanzable); i2 = 1 error + 1 warning; i3 = 1 error; i4 = 5 errores | ✅ |
 
