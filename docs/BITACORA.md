@@ -50,3 +50,22 @@
 | Simulador de escenarios | O(\|w\|·(\|Q\|+\|δ\|)) | w = palabra del escenario |
 
 ## Sesión 3 — (Gaby)
+
+### Ajuste didáctico de `invalidos.i1_alcance` (23-nov-2026)
+- **Qué cambió:** `accepting = true` (◎) en `Cerrada` (dispositivo `Cerradura`) y en `Apagada` (dispositivo `Luz`). No se tocó nada más del modelo.
+- **Por qué:** dejar `i1` como un inválido **de contexto puro**. Antes, además de los 3 errores de alcance, el razonador marcaba los dos estados iniciales como deadlock (no tenían salidas en su propio dispositivo ni eran de reposo), lo que mezclaba el error de alcance con hallazgos del razonador.
+- **Conteo:** antes 5 errores + 1 warning (3 "out of search scope" + 2 deadlocks + `Encendida` inalcanzable); ahora **3 errores + 1 warning** (3 "out of search scope" + `Encendida` inalcanzable). El resto de la sandbox no cambió: v1–v3 con 0 errores, i2 = 1E + 1W, i3 = 1E, i4 = 5E.
+- **Pruebas:** ninguna prueba de `domus.tests` depende de `i1` (el modelo de pruebas no importa la sandbox; `ErroresDeReglas` usa su propia copia `ErrAlcance`).
+- **Concepto:** la condición de alcance es **sensible al contexto** (la referencia es válida solo dentro de su dispositivo); deadlock y trampa son propiedades **decidibles** del autómata que dependen de F, el alcance no.
+
+### Nota para clones nuevos: Rebuild Project antes de validar
+En un clon nuevo no existe `classes_gen/` (no se sube a git). Si se valida o se hace un Make parcial sin compilar antes el lenguaje, el generador falla con `package IDeviceElement__BehaviorDescriptor does not exist` (`QueriesGenerated.java`), `domus.lang` queda "not deployed" y la sandbox muestra **cientos de errores falsos** ("Concept 'State' was not found…"). Solución: **Build → Rebuild Project** en MPS y luego validar.
+
+### Observación del razonador: un deadlock no se reporta también como trampa
+Verificado en `Razonador.analizarDispositivo` (lo invoca la regla `check_Device_Razonador`): cada estado recibe **a lo sumo un hallazgo**, elegido por una cadena `if / else if` en este orden de prioridad:
+1. no alcanzable → warning "no se puede alcanzar desde el estado inicial";
+2. alarma alcanzable → info con traza mínima (+ error "no tiene recuperación" si no es co-alcanzable);
+3. sin salidas y no de aceptación → error de deadlock;
+4. no co-alcanzable → warning de trampa ("ya no se puede volver a un estado de reposo (◎)").
+
+Por eso un deadlock (que según §4.2 también está en `Reach \ CoReach`) solo se reporta como deadlock, y una alarma sin recuperación no se reporta además como trampa. Es una decisión razonable (evita mensajes redundantes), pero §4.2 de la especificación no la menciona; conviene anotarla allí.

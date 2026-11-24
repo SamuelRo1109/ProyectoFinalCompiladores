@@ -17,7 +17,7 @@
 
 | ID | Requisito | Implementación | Sesión | Evidencia | Estado |
 |---|---|---|---|---|---|
-| B1 | Scoping: referencias solo a elementos válidos del contexto | 7 scopes (§3.1) | S1 | Modelo `invalidos.i1_alcance` (3 errores "out of search scope"); test automático en `domus.tests` (`ErroresDeReglas`: alcance; `ModelosSanos`: v1–v3 sin falsos positivos) | ✅ |
+| B1 | Scoping: referencias solo a elementos válidos del contexto | 7 scopes (§3.1) | S1 | Modelo `invalidos.i1_alcance` (3 errores "out of search scope" + 1 warning del razonador: `Encendida` inalcanzable); test automático en `domus.tests` (`ErroresDeReglas`: alcance; `ModelosSanos`: v1–v3 sin falsos positivos) | ✅ |
 | B2 | Reglas de tipos (inference o checking) contra errores del dominio | `RoleType` con subtipado, `AlphabetType`; checking rules R-INI, R-UNQ, R-ALM, R-SNS, R-ACY | S1 | Modelos `i2`, `i3`, `i4` con sus errores; tests `has error` en `domus.tests` (`ErroresDeReglas`: roles, alfabeto, R-INI/R-UNQ/R-ALM/R-SNS/R-ACY; `ModelosSanos`) | ✅ |
 | B3 | Errores de dominio tipo "incompatibilidad de unidades o roles" | Rol sin privilegio (i2); alfabetos incompatibles (i3) | S1 | Mensajes de i2 (rol) e i3 (alfabeto) verificados con `check_root_node_problems`; tests `has error` en `domus.tests` (`ErroresDeReglas`: roles y alfabeto; `ModelosSanos`) | ✅ |
 
@@ -43,7 +43,7 @@
 | H2-1 | Repo Git con proyecto MPS funcional | S1 | Rama `feature/s1-estructura-semantica` + PR S1; tag `v0.2-hito2` pendiente | 🟨 |
 | H2-2 | Structure, Editor, Constraints, Typesystem completos | S1 (+ tabla S3) | Structure, Editor, Constraints y Typesystem hechos; tabla δ queda para S3 | 🟨 |
 | H2-3 | ≥ 3 modelos válidos en la Sandbox | S1 | `domus.lang.sandbox.validos.v1_cerradura`, `v2_alarma`, `v3_casa`: 0 errores | ✅ |
-| H2-4 | ≥ 3 modelos inválidos que muestren errores de contexto y tipos | S1 | `domus.lang.sandbox.invalidos.i1_alcance`..`i4_restricciones`: 3, 1, 1 y 5 errores | ✅ |
+| H2-4 | ≥ 3 modelos inválidos que muestren errores de contexto y tipos | S1 | `domus.lang.sandbox.invalidos.i1_alcance`..`i4_restricciones`: i1 = 3 errores de alcance + 1 warning (inalcanzable); i2 = 1 error + 1 warning; i3 = 1 error; i4 = 5 errores | ✅ |
 
 ## Hito 3
 
