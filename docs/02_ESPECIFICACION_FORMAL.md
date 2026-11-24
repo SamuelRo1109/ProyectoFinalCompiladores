@@ -204,6 +204,10 @@ Error de dominio que atrapa: **un actor sin privilegios ejecuta un comando restr
 | Alarma alcanzable (deducción) | `∃w: δ*(q₀,w) ∩ AlarmStates ≠ ∅` → **info** con la traza `w` mínima que dispara la alarma | BFS con padres | `O(|Q| + |δ|)` |
 | Alarma sin recuperación | `q ∈ AlarmStates ∩ Reach` y `q ∉ CoReach` (desde la alarma no se puede volver a reposo) → error | Reach ∩ ¬CoReach | `O(|Q| + |δ|)` |
 
+**Prioridad de hallazgos por estado.** Para evitar mensajes redundantes, cada estado recibe a lo sumo un hallazgo, con esta prioridad:
+inalcanzable > alarma alcanzable (+ error si no tiene recuperación) > deadlock > trampa.
+Así, un deadlock (que también está en `Reach \ CoReach`) se informa solo como deadlock, y una alarma sin recuperación no se informa además como trampa. Verificado en `Razonador.analizarDispositivo` (`domus.reasoner`), que invoca la regla `check_Device_Razonador`.
+
 Un modelo es **válido** si no tiene errores estáticos (§3) ni errores del razonador; los warnings e infos son deducciones permitidas.
 
 ### 4.3 Teorema de Kleene, parte 1 (ER → AF): compilar políticas
