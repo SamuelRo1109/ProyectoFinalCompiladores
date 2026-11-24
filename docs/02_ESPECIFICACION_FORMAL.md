@@ -139,6 +139,10 @@ Sea `dev(n)` el `Device` ancestro de `n` y `sys(n)` el `HomeSystem` ancestro.
 Restricción de propiedad: `name` de `Device`, `State`, `Event` y `Role` debe pertenecer al lenguaje regular
 `ID = [A-Za-z_][A-Za-z0-9_]*` (el propio validador es un autómata finito: Kleene aplicado al DSL).
 
+Un nombre inválido produce **dos** mensajes a propósito: el de la restricción de propiedad (aviso inmediato) y el de la regla `check_*_NombreValido` (explicación en español). Ver §7.
+
+El error de una referencia fuera de ámbito es el mensaje estándar de MPS, en inglés: «The reference  <nombre> (<rol>) is out of search scope». Ver §7.
+
 ### 3.2 Reglas de verificación (checking rules)
 
 | Regla | Formalización | Severidad |
@@ -265,3 +269,16 @@ Cada uno es un **modelo MPS separado** en `domus.lang.sandbox` (literal a la gu�
 | `invalidos.i4_restricciones` | inválido (**contexto**) | Dos estados iniciales, alarma de aceptación, sensor con rol, nombre `2estado` |
 
 Los modelos `invalidos.*` llevan activado **Do not generate**.
+
+---
+
+## 7. Decisiones y limitaciones aceptadas (cierre de S3)
+
+| Tema | Decisión | Motivo |
+|---|---|---|
+| Mensaje de alcance en inglés | **Limitación documentada.** Se mantiene el mensaje estándar de MPS («The reference  … is out of search scope»). | Lo genera el comprobador de referencias del propio MPS y no es configurable. Una regla propia en español duplicaría cada error. `GUIA_USUARIO.md` §6.1 lo explica en español. |
+| Error doble en nombres inválidos (p. ej. `2estado`) | **Decisión de diseño:** dos mensajes complementarios (restricción de propiedad + `check_*_NombreValido`). | La restricción da aviso inmediato (el validador `ID` es un autómata finito) y la regla explica en español. `ErroresDeReglas` prueba ambos; `invalidos.i4_restricciones` tiene 5 errores. |
+| Intentions "Mostrar ER equivalente" / "Mostrar AFD mínimo" | **Fuera de alcance.** | El AFD mínimo aparece en el info de cada política (§4.3) y la ER equivalente en el reporte generado (§4.5, §5). |
+| Política `SesionCompleta` de `validos.v2_alarma` | **Aceptada por el equipo.** Se añadió `(disparar · tiempoEntrada · autoSilencio)*` tras `armar`. | El razonador encontró que la política era más estricta que el dispositivo (contraejemplo `armar · disparar · tiempoEntrada · autoSilencio · disparar · desarmar`). La corrección se justifica con el lema de Arden. |
+| Proyección no textual (§2) | Rejilla `table-component` en lugar de `jetbrains.mps.lang.editor.table`. | El lenguaje de tablas exige un nodo por casilla y `Transition` usa referencias. |
+| Prioridad de hallazgos del razonador | Un hallazgo por estado: inalcanzable > alarma > deadlock > trampa (§4.2). | Evita mensajes redundantes. |

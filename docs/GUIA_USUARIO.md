@@ -257,6 +257,18 @@ Domus puede convertir tu sistema en un programa Java que imprime el **reporte de
 
 > **Qué verás:** en el clic derecho sobre el modelo, **Generate Model** aparece hacia la mitad del menú, cerca de *Make Model* y *Rebuild Model*. La terminal se abre como un panel en la parte inferior de MPS; tras pegar las líneas, el reporte se imprime ahí mismo, empezando por una línea de signos `=` y el título `REPORTE DE VERIFICACIÓN del sistema …`.
 
+
+### 7.1 Correr las pruebas automáticas (opcional)
+
+El proyecto trae 60 pruebas automáticas en `domus.tests`. Para correrlas:
+1. En Logical View, despliega `domus.tests` y haz **clic derecho sobre el modelo `domus.tests@tests` → Run Tests**.
+2. Se abre la ventana **Run** abajo. Al terminar debe decir **Tests passed: 60 of 60** y `Process finished with exit code 0`.
+3. Si aparece `UnsupportedClassVersionError`: **Run → Edit Configurations**, elige la configuración de las pruebas (puedes renombrarla «Pruebas Domus»), pon en **JRE** `C:\Program Files\JetBrains\MPS 2026.2\jbr` y pulsa **Apply → OK**. Luego vuelve a ejecutarla con el botón ▶ de arriba.
+
+La configuración se guarda solo en tu computador (no se sube a Git), así que en una PC nueva hay que repetir estos pasos una vez. Las líneas rojas que a veces salen en la consola son mensajes internos de MPS, no fallos: lo que cuenta es «Tests passed».
+
+![Pruebas en verde](img/pruebas_verde.png)
+
 ---
 
 ## 8. Ejercicio para la prueba de usuario (D1)

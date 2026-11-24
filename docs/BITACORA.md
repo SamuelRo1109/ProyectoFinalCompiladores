@@ -114,7 +114,7 @@ Por eso un deadlock (que según §4.2 también está en `Reach \ CoReach`) solo 
 - **Ensayo vía MCP:** se aplicó cada cambio que rompe el modelo, se validó, se copió el mensaje literal al guion y se revirtió. Mensajes obtenidos: 3 × "out of search scope", "Incompatibilidad de roles…", "El estado 'Atenuada' es un bloqueo (deadlock)…", "Política violada: la traza 'abrir · cerrar' contiene el patrón prohibido". Al terminar, `caso_en_vivo` = 0 errores y el resto de la sandbox sin cambios.
 - **Generación y ejecución:** Make del modelo correcto. El `main` se compiló y ejecutó con el `javac`/`java` del JBR de MPS (Java 25); la salida real está en el guion (ER equivalentes por Kleene 2, AFD mínimos, simulación ACEPTADO).
   - No se ejecuta desde MPS porque el módulo `domus.lang.sandbox` tiene la compilación en MPS desactivada (`compile="off"`).
-  - El ensayo de la terminal se hizo con Git Bash; los comandos del guion son su equivalente en PowerShell.
+  - Los comandos del guion se ejecutaron tal cual en `powershell.exe` (verificado en los ajustes posteriores a la Fase 7 y de nuevo en la Fase 8).
 - **Pendiente para Erika:** probar una vez los gestos marcados con ⚠️ en el guion (Enter para añadir evento, coma para añadir estado, Ctrl+V de una fila entre tablas). No se pueden ensayar por MCP.
 
 ### Fase 7 — Guía de usuario (23-nov-2026)
@@ -129,3 +129,16 @@ Por eso un deadlock (que según §4.2 también está en `Reach \ CoReach`) solo 
 - **README:** sección "Inicio rápido" (7 pasos) con enlaces a la guía y al guion de la demo.
 - **Marcadores [captura: …]:** 11, a completar con pantallazos antes de la prueba D1.
 - **Concepto:** la guía traduce cada error a lenguaje cotidiano, como pedía la convención del proyecto: mensajes entendibles sin saber teoría y que nombran el elemento afectado.
+
+### Fase 8 — QA y auditoría (23-nov-2026)
+- **Pruebas `domus.tests`:** 60 de 60 en verde (Tests passed: 60 of 60, exit code 0) con la configuración «Pruebas Domus»; captura `docs/img/pruebas_verde.png`. Las ejecutó Gaby en MPS (no hay herramienta MCP para correr pruebas). La configuración de ejecución se guarda en `domus/.mps/workspace.xml`, que es local y no se versiona; la guía explica cómo correrlas sin ella (§7.1). Las líneas rojas que aparecen en la consola son trazas internas de MPS (indexación), no fallos.
+- **Sandbox revalidada:** v1, v2, v3 y `demo.caso_en_vivo` = 0 errores; i1 = 3 E + 1 W; i2 = 1 E + 1 W; i3 = 1 E; i4 = 5 E.
+- **Generación y ejecución:** `v1_cerradura` se generó y su `main` se ejecutó con el JBR de MPS en `powershell.exe`. La salida coincide con lo documentado: alarma alcanzable por `forzar`, ER equivalente de Kleene 2, `CicloCompleto` con AFD mínimo de 5 estados (4 útiles + sumidero), `NoBloquearAbierta` de 4, y escenario `EntradaNormal` ACEPTADO.
+- **Clon limpio:** se clonó la rama `feature/s3-editor-ux-qa` en una carpeta temporal fuera del proyecto. No hay archivos generados versionados (`source_gen`, `classes_gen`, `test_gen`, `workspace.xml`) y están todos los docs e imágenes. El clon se borró. La rama aún no está publicada en GitHub, por eso se clonó desde el repositorio local.
+- **Prueba real en una PC nueva:** la sesión S3 de hoy se hizo en la PC de Gaby con un clon nuevo, y fue la prueba real de instalación. Sin `classes_gen`, el lenguaje no estaba desplegado y la sandbox mostraba cientos de errores falsos («Concept … was not found»; el generador fallaba con `IDeviceElement__BehaviorDescriptor`) hasta hacer **Rebuild Project**. Está documentado en el README, en `GUIA_USUARIO.md` §1.4 y en esta bitácora (S3).
+- **Auditoría de `03_TRAZABILIDAD_GUIA.md`:** cada fila tiene ahora evidencia concreta (nodo, regla, prueba, archivo o salida). Quedan 🟨 D1 (prueba con usuario externo, a cargo de Erika), H3-4 (video, a cargo de Erika), H2-1 y H3-1 (tags en la Fase 9). Se añadió la lista "Capturas para el documento".
+- **Decisiones sobre los pendientes heredados de S2** (aceptadas por el equipo; registradas en `02_ESPECIFICACION_FORMAL.md` §7):
+  1. **Mensaje de alcance en inglés** («The reference  … is out of search scope»): **limitación documentada**. Lo genera el comprobador de referencias del propio MPS y no se puede traducir. Una regla propia en español duplicaría los errores (3 → 6). La guía y el guion lo explican en español.
+  2. **Error doble de `2estado`:** **decisión de diseño**. Son dos capas complementarias: la restricción de propiedad (el validador `ID` es un autómata finito) avisa al momento, y la regla `check_*_NombreValido` explica el problema en español. La prueba `ErroresDeReglas` espera ambos mensajes; i4 sigue con 5 errores.
+  3. **Intentions opcionales** ("Mostrar ER equivalente" y "Mostrar AFD mínimo"): **fuera de alcance**. El AFD mínimo ya aparece en el info de cada política y la ER equivalente en el reporte generado.
+  4. **Política `SesionCompleta` de v2** (cambiada en S2 sin consulta tras el contraejemplo del razonador): **decisión aceptada por el equipo**. Está justificada con el lema de Arden y se usará en el video como ejemplo de un error real encontrado por el razonador.
