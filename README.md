@@ -29,4 +29,14 @@ docs/BITACORA.md            Bitácora de investigación
 GitFlow con `main` y `develop` protegidas (PR + 1 aprobación). Detalle en `docs/01_ANALISIS_Y_PLAN.md` §6.
 
 ## Inicio rápido
-(Lo completa Gaby en la Sesión 3.)
+1. Instala **JetBrains MPS 2026.2 (Build #MPS-262.11879.701)** y **Git**.
+2. Clona el repo: `git clone https://github.com/SamuelRo1109/ProyectoFinalCompiladores.git` (ruta sin espacios).
+3. En MPS: **Open** → carpeta **`domus/`** → **Trust Project**.
+4. **Build → Rebuild Project** (obligatorio la primera vez; si no, salen cientos de errores «Concept … was not found»).
+5. Abre un ejemplo: Logical View → `domus.lang.sandbox` → `validos` → `v1_cerradura` → doble clic en `CasaSegura`.
+6. Atajo clave: **Ctrl+Espacio** para completar; **Enter** al final de una fila agrega otra en la tabla δ.
+7. Para generar y ejecutar el Java, usa la terminal con el JBR de MPS (sección 7 de la guía).
+
+Guía completa para principiantes: [`docs/GUIA_USUARIO.md`](docs/GUIA_USUARIO.md) · Guion de la demo: [`docs/GUION_DEMO.md`](docs/GUION_DEMO.md)
+
+**Entrega final (video, documento y prueba D1):** [`docs/ENTREGA_ERIKA.md`](docs/ENTREGA_ERIKA.md) · Relevo de la Sesión 3: [`docs/sesiones/HANDOFF_S3.md`](docs/sesiones/HANDOFF_S3.md)

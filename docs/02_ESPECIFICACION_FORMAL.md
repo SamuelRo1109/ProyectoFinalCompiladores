@@ -82,7 +82,7 @@ Cumple: ≥ 10–15 conceptos de dominio, herencia (`AlarmState`, jerarquía `Re
 ## 2. Sintaxis concreta (Editor)
 
 - Proyección textual por defecto con palabras clave en español (ver ejemplo).
-- **Proyección no textual obligatoria**: dentro de `Device`, las transiciones se proyectan como **tabla δ** (`jetbrains.mps.lang.editor.table`): columnas `Origen | Evento | Destino`.
+- **Proyección no textual obligatoria**: dentro de `Device`, las transiciones se proyectan como **tabla δ**: columnas `Origen | Evento | Destino`. Se implementa como **rejilla** con el estilo `table-component` de `jetbrains.mps.lang.editor` (encabezado en negrita, bordes por celda, ancho fijo por columna), no con `jetbrains.mps.lang.editor.table`: ese lenguaje exige un **nodo por casilla** y `Transition` guarda `source`/`event`/`target` como **referencias**, así que usarlo obligaría a cambiar la estructura y migrar todos los modelos. La guía del curso acepta "bloques o matriz" como proyección no textual.
 - Expresiones regulares en notación infija; los paréntesis son un nodo (`ParenExpr`) — **no hay ambigüedad posible porque el usuario edita el árbol, no texto** (edición proyectiva). La precedencia solo afecta la presentación.
 - Estado inicial con `→`, estado de aceptación con `◎`, alarma en rojo.
 
@@ -138,6 +138,10 @@ Sea `dev(n)` el `Device` ancestro de `n` y `sys(n)` el `HomeSystem` ancestro.
 
 Restricción de propiedad: `name` de `Device`, `State`, `Event` y `Role` debe pertenecer al lenguaje regular
 `ID = [A-Za-z_][A-Za-z0-9_]*` (el propio validador es un autómata finito: Kleene aplicado al DSL).
+
+Un nombre inválido produce **dos** mensajes a propósito: el de la restricción de propiedad (aviso inmediato) y el de la regla `check_*_NombreValido` (explicación en español). Ver §7.
+
+El error de una referencia fuera de ámbito es el mensaje estándar de MPS, en inglés: «The reference  <nombre> (<rol>) is out of search scope». Ver §7.
 
 ### 3.2 Reglas de verificación (checking rules)
 
@@ -204,6 +208,10 @@ Error de dominio que atrapa: **un actor sin privilegios ejecuta un comando restr
 | Alarma alcanzable (deducción) | `∃w: δ*(q₀,w) ∩ AlarmStates ≠ ∅` → **info** con la traza `w` mínima que dispara la alarma | BFS con padres | `O(|Q| + |δ|)` |
 | Alarma sin recuperación | `q ∈ AlarmStates ∩ Reach` y `q ∉ CoReach` (desde la alarma no se puede volver a reposo) → error | Reach ∩ ¬CoReach | `O(|Q| + |δ|)` |
 
+**Prioridad de hallazgos por estado.** Para evitar mensajes redundantes, cada estado recibe a lo sumo un hallazgo, con esta prioridad:
+inalcanzable > alarma alcanzable (+ error si no tiene recuperación) > deadlock > trampa.
+Así, un deadlock (que también está en `Reach \ CoReach`) se informa solo como deadlock, y una alarma sin recuperación no se informa además como trampa. Verificado en `Razonador.analizarDispositivo` (`domus.reasoner`), que invoca la regla `check_Device_Razonador`.
+
 Un modelo es **válido** si no tiene errores estáticos (§3) ni errores del razonador; los warnings e infos son deducciones permitidas.
 
 ### 4.3 Teorema de Kleene, parte 1 (ER → AF): compilar políticas
@@ -261,3 +269,16 @@ Cada uno es un **modelo MPS separado** en `domus.lang.sandbox` (literal a la gu�
 | `invalidos.i4_restricciones` | inválido (**contexto**) | Dos estados iniciales, alarma de aceptación, sensor con rol, nombre `2estado` |
 
 Los modelos `invalidos.*` llevan activado **Do not generate**.
+
+---
+
+## 7. Decisiones y limitaciones aceptadas (cierre de S3)
+
+| Tema | Decisión | Motivo |
+|---|---|---|
+| Mensaje de alcance en inglés | **Limitación documentada.** Se mantiene el mensaje estándar de MPS («The reference  … is out of search scope»). | Lo genera el comprobador de referencias del propio MPS y no es configurable. Una regla propia en español duplicaría cada error. `GUIA_USUARIO.md` §6.1 lo explica en español. |
+| Error doble en nombres inválidos (p. ej. `2estado`) | **Decisión de diseño:** dos mensajes complementarios (restricción de propiedad + `check_*_NombreValido`). | La restricción da aviso inmediato (el validador `ID` es un autómata finito) y la regla explica en español. `ErroresDeReglas` prueba ambos; `invalidos.i4_restricciones` tiene 5 errores. |
+| Intentions "Mostrar ER equivalente" / "Mostrar AFD mínimo" | **Fuera de alcance.** | El AFD mínimo aparece en el info de cada política (§4.3) y la ER equivalente en el reporte generado (§4.5, §5). |
+| Política `SesionCompleta` de `validos.v2_alarma` | **Aceptada por el equipo.** Se añadió `(disparar · tiempoEntrada · autoSilencio)*` tras `armar`. | El razonador encontró que la política era más estricta que el dispositivo (contraejemplo `armar · disparar · tiempoEntrada · autoSilencio · disparar · desarmar`). La corrección se justifica con el lema de Arden. |
+| Proyección no textual (§2) | Rejilla `table-component` en lugar de `jetbrains.mps.lang.editor.table`. | El lenguaje de tablas exige un nodo por casilla y `Transition` usa referencias. |
+| Prioridad de hallazgos del razonador | Un hallazgo por estado: inalcanzable > alarma > deadlock > trampa (§4.2). | Evita mensajes redundantes. |

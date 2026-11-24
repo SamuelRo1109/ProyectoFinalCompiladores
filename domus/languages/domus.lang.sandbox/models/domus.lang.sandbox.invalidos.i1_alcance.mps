@@ -10,6 +10,7 @@
     <language id="cac7998d-8f0a-4a9f-9df9-7c2249914d64" name="domus.lang">
       <concept id="5903380446964765887" name="domus.lang.structure.State" flags="ng" index="1yJP62">
         <property id="5903380446964765897" name="initial" index="1yJP7O" />
+        <property id="5903380446964765898" name="accepting" index="1yJP7R" />
       </concept>
       <concept id="5903380446964765886" name="domus.lang.structure.Event" flags="ng" index="1yJP63" />
       <concept id="5903380446964765945" name="domus.lang.structure.HomeSystem" flags="ng" index="1yJP74">
@@ -47,6 +48,7 @@
       <node concept="1yJP62" id="3S1cLRl0cFG" role="1yJP7J">
         <property role="TrG5h" value="Cerrada" />
         <property role="1yJP7O" value="true" />
+        <property role="1yJP7R" value="true" />
       </node>
     </node>
     <node concept="1yJP7Z" id="3S1cLRl0cFI" role="1yJP76">
@@ -57,6 +59,7 @@
       <node concept="1yJP62" id="3S1cLRl0cFK" role="1yJP7J">
         <property role="TrG5h" value="Apagada" />
         <property role="1yJP7O" value="true" />
+        <property role="1yJP7R" value="true" />
       </node>
       <node concept="1yJP62" id="3S1cLRl0cFL" role="1yJP7J">
         <property role="TrG5h" value="Encendida" />
