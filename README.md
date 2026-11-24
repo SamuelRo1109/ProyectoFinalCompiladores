@@ -38,3 +38,5 @@ GitFlow con `main` y `develop` protegidas (PR + 1 aprobación). Detalle en `docs
 7. Para generar y ejecutar el Java, usa la terminal con el JBR de MPS (sección 7 de la guía).
 
 Guía completa para principiantes: [`docs/GUIA_USUARIO.md`](docs/GUIA_USUARIO.md) · Guion de la demo: [`docs/GUION_DEMO.md`](docs/GUION_DEMO.md)
+
+**Entrega final (video, documento y prueba D1):** [`docs/ENTREGA_ERIKA.md`](docs/ENTREGA_ERIKA.md) · Relevo de la Sesión 3: [`docs/sesiones/HANDOFF_S3.md`](docs/sesiones/HANDOFF_S3.md)
