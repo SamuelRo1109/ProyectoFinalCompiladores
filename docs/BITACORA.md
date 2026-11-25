@@ -142,3 +142,12 @@ Por eso un deadlock (que según §4.2 también está en `Reach \ CoReach`) solo 
   2. **Error doble de `2estado`:** **decisión de diseño**. Son dos capas complementarias: la restricción de propiedad (el validador `ID` es un autómata finito) avisa al momento, y la regla `check_*_NombreValido` explica el problema en español. La prueba `ErroresDeReglas` espera ambos mensajes; i4 sigue con 5 errores.
   3. **Intentions opcionales** ("Mostrar ER equivalente" y "Mostrar AFD mínimo"): **fuera de alcance**. El AFD mínimo ya aparece en el info de cada política y la ER equivalente en el reporte generado.
   4. **Política `SesionCompleta` de v2** (cambiada en S2 sin consulta tras el contraejemplo del razonador): **decisión aceptada por el equipo**. Está justificada con el lema de Arden y se usará en el video como ejemplo de un error real encontrado por el razonador.
+
+### Fase 9 — Release (23-nov-2026)
+- **Relevo:** `docs/sesiones/HANDOFF_S3.md` y `docs/ENTREGA_ERIKA.md` (video, documento, capturas, prueba D1 y checklist final para Erika), enlazados desde el README.
+- **PR #3** (`feature/s3-editor-ux-qa` → `develop`): aprobado por Samuel y fusionado con **merge commit `c476897`** (sin squash ni rebase, para conservar los hashes). Para poder hacer push, la cuenta de Gaby aceptó la invitación de colaboradora con permiso de escritura.
+- **PR #4** (`release/hito-3` → `main`, «Release Hito 3 (v1.0)»): rama creada desde `develop`, revisores Luis y Samuel. Integra S1 (PR #1), S2 (PR #2) y S3 (PR #3).
+- **Plan de tags** (se crean tras el merge del PR #4):
+  - `v0.2-hito2` en el commit `734ba96` (tabla δ documentada, Hito 2 completo) → fila H2-1;
+  - `v1.0-hito3` en el merge de `release/hito-3` a `main` → fila H3-1.
+- **Concepto:** GitFlow como control de versiones del propio lenguaje. Cada hito queda fijado en un commit concreto y es reproducible: un clon de ese tag más **Rebuild Project** reconstruye exactamente el lenguaje evaluado.
